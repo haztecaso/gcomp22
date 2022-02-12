@@ -9,9 +9,12 @@ from typing import Callable, List
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Valores por defecto de los parámetros
 DEFAULT_EPSILON   = 1e-10
 DEFAULT_N_ULTIMOS = 20
-DEFAULT_MAX_ITERS  = inf
+
+# Variables globales
+MAX_ITERS  = int(1e7)
 
 class DemasiadasIteraciones(Exception):
     def __init__(self, max_iters):
@@ -73,9 +76,8 @@ def periodo(orbita, epsilon = DEFAULT_EPSILON, N = DEFAULT_N_ULTIMOS):
             return i - 1
 
 
-def periodo_gen(r:float, x0:float = 0.5, epsilon = DEFAULT_EPSILON,
-        N = DEFAULT_N_ULTIMOS, max_iters = DEFAULT_MAX_ITERS,
-        orbita:List[float]=None):
+def periodo_gen(r:float, x0:float, epsilon = DEFAULT_EPSILON,
+        N:int = DEFAULT_N_ULTIMOS, orbita:List[float]=None):
     """
     Versión perezosa de la función periodo. En vez de calcular previamente la
     órbita, la va calculando poco a poco hasta que se alcance la precisión
@@ -103,7 +105,7 @@ def periodo_gen(r:float, x0:float = 0.5, epsilon = DEFAULT_EPSILON,
         ultimos[-1] = valor
         iters +=1
     for valor in orb: # Búsqueda de periodos
-        if iters > max_iters: raise DemasiadasIteraciones(max_iters)
+        if iters > MAX_ITERS: raise DemasiadasIteraciones(MAX_ITERS)
         if orbita is not None: orbita.append(valor)
         ultimos = np.roll(ultimos, -1)
         ultimos[-1] = valor
@@ -113,23 +115,55 @@ def periodo_gen(r:float, x0:float = 0.5, epsilon = DEFAULT_EPSILON,
                 return p 
         iters +=1
 
+def atractor(orbita, epsilon = DEFAULT_EPSILON, N = DEFAULT_N_ULTIMOS):
+    per = periodo(orbita, epsilon, N)
+    return np.sort([orbita[-1-i] for i in range(per)]) if per else None
+
+def atractor_gen(r:float, x0:float, epsilon:float = DEFAULT_EPSILON,
+        N=DEFAULT_N_ULTIMOS, orbita:List[float] = None):
+    if orbita is None:
+        orbita = []
+    per = periodo_gen(r, x0, epsilon, N, orbita)
+    return np.sort([orbita[-1-i] for i in range(per)]) if per else None
+
+def orbita_atractor_plot(r:float, x0:float, N:int,
+        epsilon:float = DEFAULT_EPSILON, N_ULT:int=DEFAULT_N_ULTIMOS):
+    orb = orbita(r, x0, N)
+    atr = atractor(orb, epsilon, N_ULT)
+    if atr is not None:
+        plt.plot(orb)
+        for valor in atr:
+            plt.axhline(y = valor, color = 'r', linestyle = '-')
+        plt.show()
+    else:
+        print("Error: ¡No se ha podido encontrar un periodo (y por tanto un conjunto atractor)!")
+        print("Prueba a incrementar el número de iteraciones.")
+
+def orbita_atractor_plot_gen(r:float, x0:float, N:int,
+        epsilon:float = DEFAULT_EPSILON, N_ULT=DEFAULT_N_ULTIMOS):
+    orb = []
+    atr = atractor_gen(epsilon, N_ULT)
+    if atr is not None:
+        plt.plot(orb)
+        for valor in atr:
+            plt.axhline(y = valor, color = 'r', linestyle = '-')
+        plt.show()
+    else:
+        print("Error: ¡No se ha podido encontrar un periodo (y por tanto un conjunto atractor)!")
+        print("Prueba a incrementar el número de iteraciones.")
+
 def test_periodo():
     timeA = time.time()
     print(f"{periodo(orbita(3.45, .5, 20000)) = }")
     timeB = time.time()
-    print(f"{periodo_gen(3.45)  = }")
+    print(f"{periodo_gen(3.45, .5)  = }")
     timeC = time.time()
     print(f"{timeB-timeA = }")
     print(f"{timeC-timeB = }")
 
 def main():
-    orb = []
-    p = periodo_gen(3.5, epsilon=10, orbita=orb)
-    print(p)
-    print(len(orb))
-    orb = np.asarray(orb)
-    plt.plot(orb)
-    plt.show()
+    orbita_atractor_plot(3.5, .5, 100)
+    orbita_atractor_plot(3.5, .5, 100)
 
 if __name__ == "__main__":
     main()
