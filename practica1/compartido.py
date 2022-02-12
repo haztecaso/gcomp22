@@ -3,12 +3,20 @@
 
 from typing import Callable
 
+import logging
+
 # Valores por defecto de los parámetros
-DEFAULT_EPSILON   = 1e-6
+DEFAULT_ε   = 1e-6
 
 # Variables globales
 MAX_ITERS  = int(1e7) # Máximo de iteraciones al calcular las órbitas
 N_ULT      = 20 # Número de valores que considerar para calcular el periodo
+
+# Configuración del logger. Se puede cambiar el nivel del logger para debuguear
+# o no imprimir ningún mensaje.
+logging.basicConfig(level=logging.INFO, format='%(message)s', )
+logging.getLogger('matplotlib').setLevel(logging.ERROR)
+
 
 class DemasiadasIteraciones(Exception):
     def __init__(self, max_iters):
