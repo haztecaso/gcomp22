@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from itertools import islice
+from math import inf
+import time
+from typing import Callable, List
+
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.typing import ArrayLike
-from typing import Callable
-import time
-from math import inf
 
 DEFAULT_EPSILON   = 1e-10
 DEFAULT_N_ULTIMOS = 20
@@ -37,11 +38,11 @@ def orbita(r:float, x0:float, N:int):
     :return: Órbita de longitud N (array de numpy)
     """
     f = logistica(r)
-    o = np.empty((N,))
-    o[0] = x0
+    orb = np.empty((N,))
+    orb[0] = x0
     for i in range(1, N):
-        o[i] = f(o[i-1])
-    return o
+        orb[i] = f(orb[i-1])
+    return orb
 
 def orbita_gen(r:float, x0:float):
     """
@@ -65,45 +66,54 @@ def periodo(orbita, epsilon = DEFAULT_EPSILON, N = DEFAULT_N_ULTIMOS):
     :param int n: Número de valores que considerar para calcular el periodo
     :param float epsilon: Precisión 
     """
-    assert N <= len(orbita), f"No se pueden seleccionar {n} valores de una órbita de longitud {len(orbita)}"
+    assert N <= len(orbita), f"No se pueden seleccionar {N} valores de una órbita de longitud {len(orbita)}"
     suborbita = orbita[range(-N, 0, 1)]
     for i in range(2, N-1, 1):
         if abs(suborbita[N-1] - suborbita[N-i]) < epsilon:
             return i - 1
 
 
-def periodo_gen(r:float, x0:float = 0.5, epsilon = DEFAULT_EPSILON, N =
-        DEFAULT_N_ULTIMOS, max_iters = DEFAULT_MAX_ITERS):
+def periodo_gen(r:float, x0:float = 0.5, epsilon = DEFAULT_EPSILON,
+        N = DEFAULT_N_ULTIMOS, max_iters = DEFAULT_MAX_ITERS,
+        orbita:List[float]=None):
     """
     Versión perezosa de la función periodo. En vez de calcular previamente la
     órbita, la va calculando poco a poco hasta que se alcance la precisión
     deseada.
+    Pros: no hay que fijar el número de iteraciones
+    Contras:
+      - hay que fijar el número posibles de periodos que sebuscan (parámetro N)
+      - se hacen más cuentas, ya que en cada iteración se comprueban todos los
+        posibles periodos
 
     :param float r: Parámetro r de la función logística
     :param float x0: Valor inicial de la órbita
     :param float epsilon: Precisión 
     :param int N: Número de valores que considerar para calcular el periodo
     :param int max_iter: Número máximo de iteraciones
+    :param list valores: Lista donde guardar los valores de la órbita. Parámetro opcional.
     """
     ultimos = np.empty((N,))
-    orbita = orbita_gen(r, x0)
+    orb = orbita_gen(r, x0)
     iters = 0
     for _ in range(N): # Llenado inicial del array ultimos
         ultimos = np.roll(ultimos, -1)
-        ultimos[-1] = next(orbita)
+        valor = next(orb)
+        if orbita is not None: orbita.append(valor)
+        ultimos[-1] = valor
         iters +=1
-    while True: # Búsqueda de periodos
-        if iters > max_iters:
-            raise DemasiadasIteraciones(max_iters)
+    for valor in orb: # Búsqueda de periodos
+        if iters > max_iters: raise DemasiadasIteraciones(max_iters)
+        if orbita is not None: orbita.append(valor)
         ultimos = np.roll(ultimos, -1)
-        ultimos[-1] = next(orbita)
+        ultimos[-1] = valor
         for p in range(1, N): # En cada iteración se comprueban todos los posibles periodos
+            print(f"{abs(ultimos[-1] - ultimos[N-p-1]) = }")
             if abs(ultimos[-1] - ultimos[N-p-1]) < epsilon:
                 return p 
         iters +=1
 
-
-def main():
+def test_periodo():
     timeA = time.time()
     print(f"{periodo(orbita(3.45, .5, 20000)) = }")
     timeB = time.time()
@@ -111,8 +121,15 @@ def main():
     timeC = time.time()
     print(f"{timeB-timeA = }")
     print(f"{timeC-timeB = }")
-    # plt.plot(o[range(N-100,N)])
-    # plt.show()
+
+def main():
+    orb = []
+    p = periodo_gen(3.5, epsilon=10, orbita=orb)
+    print(p)
+    print(len(orb))
+    orb = np.asarray(orb)
+    plt.plot(orb)
+    plt.show()
 
 if __name__ == "__main__":
     main()
