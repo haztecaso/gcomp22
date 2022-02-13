@@ -5,7 +5,9 @@ pkgs.mkShell {
     pkgs.python38Full
     numpy
     matplotlib
+    ipython
   ];
-  # shellHook = ''
-  # '';
+   shellHook = ''
+     alias python=ipython
+  '';
 }

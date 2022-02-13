@@ -1,11 +1,34 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+#which -*- coding: utf-8 -*-
 
 import matplotlib.pyplot as plt
 import numpy as np
 
+import logging
+from typing import Callable
 
-from compartido import *
+# Valores por defecto de los parámetros
+DEFAULT_ε   = 1e-6
+
+# Variables globales
+MAX_ITERS  = int(1e4) # Máximo de iteraciones al calcular las órbitas
+N_ULT      = 32 # Número de valores que considerar para calcular el periodo
+
+class PeriodoNoEncontrado(Exception):
+    def __init__(self):
+        self.message = f"No se ha podido encontrar un periodo."
+        super().__init__(self.message)
+
+def logistica(r:float) -> Callable[[float], float]:
+    """
+    Función logística parametrizada por el parámetro r.
+    Dado un parámetro r de tipo float devuelve la función logística
+    correspondiente de tipo float -> float.
+
+    :param float r: Parámetro r de la función logística
+    :return: Función logística de tipo float -> float
+    """
+    return lambda x: r*x*(1-x)
 
 def orbita(r:float, x0:float, N:int):
     """
@@ -25,10 +48,9 @@ def orbita(r:float, x0:float, N:int):
         logging.debug(f"{n = };{orb[n] = }")
     return orb
 
-
 def periodo(orbita:np.ndarray, ε:float = DEFAULT_ε):
     """
-    Calcula el periodo de una órbita dada una tolerancia.
+    Calcula el periodo de una órbita.
 
     :param orbita: Array con la órbita (generado con la función orbita)
     :param float ε: Precisión 
@@ -40,8 +62,9 @@ def periodo(orbita:np.ndarray, ε:float = DEFAULT_ε):
         logging.debug(f"{p = }; {abs(ultimos[-1] - ultimos[N_ULT-p-1]) = }")
         if abs(ultimos[N_ULT-1] - ultimos[N_ULT-p]) < ε:
             return p - 1
+    raise PeriodoNoEncontrado()
 
-def atractor(orbita:np.ndarray, ε:float = DEFAULT_ε):
+def atractor(orbita:np.ndarray, ε:float = DEFAULT_ε, per:int=None):
     """
     Estima el conjunto atractor de una órbita concreta.
 
@@ -49,14 +72,14 @@ def atractor(orbita:np.ndarray, ε:float = DEFAULT_ε):
     :param float ε: Precisión 
     """
     logging.info(f"Estimando el conjunto atractor\t\t {ε = }")
-    per = periodo(orbita, ε)
+    if per is None: per = periodo(orbita, ε)
     logging.debug(f"{per = }")
-    result = np.sort([orbita[-1-i] for i in range(per)]) if per else None
-    logging.debug(f"{per = }")
+    result = np.sort([orbita[-1-i] for i in range(per)])
+    logging.info(f"Conjunto atractor estimado: {result}")
     return result
 
 
-def orbita_atractor_plot(r:float, x0:float, N:int, ε:float = DEFAULT_ε):
+def orbita_atractor_plot(r:float, x0:float, N:int, ε:float = DEFAULT_ε, show:bool = True):
     """
     Gráfico de una órbita y el conjunto atractor correspondiente
 
@@ -66,19 +89,100 @@ def orbita_atractor_plot(r:float, x0:float, N:int, ε:float = DEFAULT_ε):
     :param float ε: Precisión 
     """
     orb = orbita(r, x0, N)
-    atr = atractor(orb, ε)
-    if atr is not None:
-        plt.plot(orb)
-        for valor in atr:
-            plt.axhline(y = valor, color = 'r', linestyle = '-')
-        plt.show()
-    else:
-        print("Error: ¡No se ha podido encontrar un periodo (y por tanto un conjunto atractor)!")
-        print("Prueba a incrementar el número de iteraciones.")
+    per = periodo(orb, ε) 
+    atr = atractor(orb, ε, per)
+    plt.ylabel("x")
+    plt.xlabel("n")
+    plt.plot(orb)
+    for valor in atr:
+        plt.axhline(y = valor, color = 'r', linestyle = '-')
+    plt.title(f"Órbita y conjunto atractor\n{r, x0, N, ε = } ")
+    if show: plt.show()
+    return (orb, per, atr)
 
+def conjunto_atractor_plot(rs:np.ndarray, x0:float, N:int, ε:float =DEFAULT_ε, show:bool = True):
+    """
+    Dibujo de un conjunto atractor para múltiples r's
+
+    :param np.ndarray rs: Valores de r 
+    :param float x0: valor inicial de las órbita
+    :param int N: número de iteraciones
+    :param float ε: Precisión 
+    :param bool show: Pintar la gráfica
+    """
+    for r in rs:
+        try:
+            orb = orbita(r, x0, N)
+            atr = atractor(orb, ε)
+            for v in atr:
+                plt.plot(r, v, 'ro', markersize = 1)
+        except PeriodoNoEncontrado:
+            print(f"Periodo no encontrado para {r, N, ε = }")
+    plt.title(f"Conjunto atractor para r en ({rs[0]},{rs[-1]}), {x0 = }, {N = }, {ε = }")
+    plt.ylabel("x")
+    plt.xlabel("n")
+    if show: plt.show()
+
+def atractores_con_periodo(p:int, rs:np.ndarray, x0:float, N:int, ε:float = DEFAULT_ε, plot:bool = False, show:bool = True):
+    """
+    Dado un periodo fijo encuentra los valores de r, con sus atractores
+    correspondientes, cuyas órbitas tienen ese periodo.
+    También incluye la opción plot para dibujar los atractores obtenidos.
+
+    :param int p: El periodo que se busca
+    :param np.ndarray rs: Valores de r que testear
+    :param float x0: valor inicial de las órbita
+    :param int N: número de iteraciones
+    :param float ε: Precisión 
+    :param bool plot: Plotear la gráfica
+    :param bool show: Pintar la gráfica
+    """
+    logging.info(f"Buscando atractores con periodo {p} en el intervalo {rs[0],rs[-1]} ({N = })")
+    result_rs = []
+    result_atrs = []
+    for r in rs:
+        logging.debug(f"{r = }")
+        try:
+            orb = orbita(r, x0, N)
+            per = periodo(orb, ε)
+            logging.debug(f"{per = }")
+            if per == p:
+                atr = atractor(orb, ε, per)
+                result_rs.append(r)
+                result_atrs.append(atr)
+                for i in range(per):
+                    if plot: plt.plot(r, atr[i], 'ro' if per % 2 == 0 else 'bo', markersize=1)
+        except PeriodoNoEncontrado:
+            pass
+    if plot and show: plt.show()
+    return result_rs, result_atrs
+
+
+def apartado1(r1:float, r2:float):
+    """
+    Ejemplo de conjuntos atractores con sus correspondientes intervalos de error.
+    """
+    x0, N, ε =  0.1, 100, 1e-4
+
+    plt.subplot(2, 2, 3)
+    _, per1, atr1 = orbita_atractor_plot(r1, x0, N, ε, show = False)
+    print(f"{r1, per1, atr1 = }")
+
+    plt.subplot(2, 2, 4)
+    _, per2, atr2 = orbita_atractor_plot(r2, x0, N, ε, show = False)
+    print(f"{r2, per2, atr2 = }")
+    plt.subplot(2, 1, 1)
+    conjunto_atractor_plot(np.linspace(3,3.544,300), x0, 1000)
 
 def main():
-    orbita_atractor_plot(3.5, .5, 100)
+    # apartado1(3.01, 3.54)
+    # return
+    p, x0, N = 8, 0.5, 100
+    rs = np.linspace(3.544,4, 500)
+    atractores_con_periodo(p, rs, x0, N, plot = True)
 
 if __name__ == "__main__":
+    # Configuración del logger. Se puede cambiar el nivel del logger para debuguear o no imprimir ningún mensaje.
+    logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+    logging.getLogger('matplotlib').setLevel(logging.ERROR)
     main()
