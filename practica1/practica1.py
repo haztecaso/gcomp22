@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#which -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 import logging
-from typing import Callable, List 
+from typing import Callable
 
 # Valores por defecto de los parámetros
 DEFAULT_ε   = 1e-4
@@ -60,8 +60,11 @@ def periodo(orb:np.ndarray, ε:float = DEFAULT_ε):
     ultimos = orb[range(-N_ULT, 0, 1)]
     for p in range(2, N_ULT-1, 1):
         logging.debug(f"{p = }; {abs(ultimos[-1] - ultimos[N_ULT-p-1]) = }")
-        if abs(ultimos[N_ULT-1] - ultimos[N_ULT-p]) < ε:
-            return p - 1
+        result = True
+        for j in range(0,p):
+            result = result and abs(ultimos[N_ULT-1-j] - ultimos[N_ULT-p-j]) < ε
+        if result:
+            return p-1
     raise PeriodoNoEncontrado()
 
 def atractor(orb:np.ndarray, ε:float = DEFAULT_ε, per:int=None):
@@ -146,7 +149,7 @@ def conjunto_atractor_plot(rs:np.ndarray, x0:float, N:int, ε:float =DEFAULT_ε,
     if show: plt.show()
 
 def atractores_con_periodo(p:int, rs:np.ndarray, x0:float, N:int, ε:float = DEFAULT_ε, **kwargs):
-    """typing.
+    """
     Dado un periodo fijo encuentra los valores de r, con sus atractores
     correspondientes, cuyas órbitas tienen ese periodo.
     También incluye la opción plot para dibujar los atractores obtenidos.
@@ -156,9 +159,9 @@ def atractores_con_periodo(p:int, rs:np.ndarray, x0:float, N:int, ε:float = DEF
     :param float x0: valor inicial de las órbita
     :param int N: número de iteraciones
     :param float ε: Precisión 
-    :param bool plot: Plotear la gráfica
-    :param str fmt: Formato de la gráfica
-    :param bool show: Pintar la gráfica
+    :param bool plot: Plotear la gráfica. Valor por defecto True.
+    :param str fmt: Formato de la gráfica. Valor por defecto 'ro'.
+    :param bool show: Pintar la gráfica. Valor por defecto True.
     """
     logging.info(f"Buscando atractores con periodo {p} en el intervalo {rs[0],rs[-1]} ({N = })")
     result_rs = []
@@ -183,7 +186,6 @@ def atractores_con_periodo(p:int, rs:np.ndarray, x0:float, N:int, ε:float = DEF
     if plot and show: plt.show()
     return result_rs, result_atrs
 
-
 def apartado1():
     """
     Ejemplo de conjuntos atractores con sus correspondientes intervalos de error.
@@ -193,23 +195,23 @@ def apartado1():
     r1 = 3.0241
     plt.subplot(2, 2, 1)
     orb1, per1, atr1 = orbita_atractor_plot(r1, x0, N, ε, show = False)
-    err1 = estimar_error_atractor(orb1, per1)
+    errs1 = estimar_errores_atractor(orb1, per1)
     print(f"Estimación del atractor para r = {r1} con N = {N} y ε = {ε}:")
     print(f"- Periodo estimado: {per1}")
     print(f"- Puntos del atractor (no están escritos en notación estándar, ver memoria):")
-    for i, x in enumerate(atr1):
-        print(f"  - x_{i} = {x} ±{err1}")
+    for i in range(len(atr1)):
+        print(f"  - x_{N-1-i} = {atr1[i]} ±{errs1[i]}")
     print("")
 
     r2 = 3.4657
     plt.subplot(2, 2, 2)
     orb2, per2, atr2 = orbita_atractor_plot(r2, x0, N, ε, show = False)
-    err2 = estimar_error_atractor(orb2, per2)
+    errs2 = estimar_errores_atractor(orb2, per2)
     print(f"Estimación del atractor para r = {r2} con N = {N} y ε = {ε}:")
     print(f"- Periodo estimado: {per2}")
     print(f"- Puntos del atractor (no están escritos en notación estándar, ver memoria):")
-    for i, x in enumerate(atr2):
-        print(f"  - x_{i} = {x} ±{err2}")
+    for i in range(len(atr2)):
+        print(f"  - x_{N-i} = {atr2[i]} ±{errs2[i]}")
     plt.subplot(2, 1, 2)
     plt.axvline(x = r1, color = 'g', linestyle = '-')
     plt.axvline(x = r2, color = 'g', linestyle = '-')
@@ -221,18 +223,17 @@ def apartado2():
     """
     Estimación de valores de r en un intervalo para los que la órbita tiene periodo 8.
     """
-    p, x0, N, ε = 8, 0.1, 200, 1e-4
+    p, x0, N, ε = 8, 0.5, 1000, 1e-5
     M = 1000        # Número de r's que considerar
     a = 3.544       # Extremo inferior del intervalo de las r's
     b = 4.0         # Extremo superior del intervalo de las r's
-    delta = (b-a)/M # Tamaño de los subintervalos en los que hemos dividido
+    delta = (b-a)/(M-1) # Tamaño de los subintervalos en los que hemos dividido
     rs = np.linspace(a, b, M)
     rsp, _ = atractores_con_periodo(p, rs, x0, N, ε, plot = True, show = False)
+    print(f"Se han obtenido {len(rsp)} valores de r con periodo {p}:")
     for r in rsp:
-        print(f"{r}±{delta}")
+        print(f"- {r}±{delta}")
     plt.show()
-
-
 
 def main():
     apartado1()
