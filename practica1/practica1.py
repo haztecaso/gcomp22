@@ -48,7 +48,7 @@ def orbita(r:float, x0:float, N:int):
         logging.debug(f"{n = };{orb[n] = }")
     return orb
 
-def periodo(orbita:np.ndarray, ε:float = DEFAULT_ε):
+def periodo(orb:np.ndarray, ε:float = DEFAULT_ε):
     """
     Calcula el periodo de una órbita.
 
@@ -56,28 +56,50 @@ def periodo(orbita:np.ndarray, ε:float = DEFAULT_ε):
     :param float ε: Precisión 
     """
     logging.info(f"Estimando el periodo de una órbita\t {ε = }")
-    assert N_ULT <= len(orbita), f"No se pueden seleccionar {N_ULT} valores de una órbita de longitud {len(orbita)}"
-    ultimos = orbita[range(-N_ULT, 0, 1)]
+    assert N_ULT <= len(orb), f"No se pueden seleccionar {N_ULT} valores de una órbita de longitud {len(orb)}"
+    ultimos = orb[range(-N_ULT, 0, 1)]
     for p in range(2, N_ULT-1, 1):
         logging.debug(f"{p = }; {abs(ultimos[-1] - ultimos[N_ULT-p-1]) = }")
         if abs(ultimos[N_ULT-1] - ultimos[N_ULT-p]) < ε:
             return p - 1
     raise PeriodoNoEncontrado()
 
-def atractor(orbita:np.ndarray, ε:float = DEFAULT_ε, per:int=None):
+def atractor(orb:np.ndarray, ε:float = DEFAULT_ε, per:int=None):
     """
     Estima el conjunto atractor de una órbita concreta.
 
-    :param orbita: Array con la órbita (generado con la función orbita)
+    :param np.ndarray orbita: Array con la órbita (generado con la función orbita)
     :param float ε: Precisión 
     """
     logging.info(f"Estimando el conjunto atractor\t\t {ε = }")
-    if per is None: per = periodo(orbita, ε)
+    if per is None: per = periodo(orb, ε)
     logging.debug(f"{per = }")
-    result = np.sort([orbita[-1-i] for i in range(per)])
+    result = np.sort([orb[-1-i] for i in range(per)])
     logging.info(f"Conjunto atractor estimado: {result}")
     return result
 
+def estimar_errores_atractor(orb:np.ndarray, per:int, ε:float = DEFAULT_ε):
+    """
+    Dada una órbita y un periodo devuelve los errores estimados de los puntos
+    del atractor correspondiente.
+
+    :param np.ndarray orb: Array con la órbita (generado con la función orbita)
+    :param int per: Periodo estimado de la órbita
+    :param float ε: Precisión 
+    """
+    assert len(orb) >= 2*per, "Se necesitan al menos 2*{per}={2*per} valores para estimar el intervalo de error"
+    errs = []
+    for i in range(per):
+        errs.append(orb[-1-i] - orb[-1-i-per])
+    return errs
+
+def estimar_error_atractor(orb:np.ndarray, per:int, ε:float = DEFAULT_ε):
+    """
+    Dada una órbita y un periodo devuelve el error estimado (el mayor de todos)
+    de los puntos del atractor correspondiente.
+    """
+    errs = estimar_errores_atractor(orb, per, ε)
+    return max(errs)
 
 def orbita_atractor_plot(r:float, x0:float, N:int, ε:float = DEFAULT_ε, show:bool = True):
     """
@@ -162,27 +184,29 @@ def apartado1(r1:float, r2:float):
     """
     Ejemplo de conjuntos atractores con sus correspondientes intervalos de error.
     """
-    x0, N, ε =  0.1, 100, 1e-4
+    x0, N, ε =  0.1, 300, 1e-5
 
     plt.subplot(2, 2, 3)
-    _, per1, atr1 = orbita_atractor_plot(r1, x0, N, ε, show = False)
-    print(f"{r1, per1, atr1 = }")
+    orb1, per1, atr1 = orbita_atractor_plot(r1, x0, N, ε, show = False)
+    err1 = estimar_error_atractor(orb1, per1, ε)
+    print(f"{r1, per1, atr1, err1 = }")
 
     plt.subplot(2, 2, 4)
-    _, per2, atr2 = orbita_atractor_plot(r2, x0, N, ε, show = False)
-    print(f"{r2, per2, atr2 = }")
+    orb2, per2, atr2 = orbita_atractor_plot(r2, x0, N, ε, show = False)
+    err2 = estimar_error_atractor(orb2, per2, ε)
+    print(f"{r2, per2, atr2, err2 = }")
     plt.subplot(2, 1, 1)
-    conjunto_atractor_plot(np.linspace(3,3.544,300), x0, 1000)
+    conjunto_atractor_plot(np.linspace(3,3.544,300), x0, 1000, ε, show = False)
 
 def main():
-    # apartado1(3.01, 3.54)
-    # return
+    apartado1(3.01, 3.54)
+    return
     p, x0, N = 8, 0.5, 100
     rs = np.linspace(3.544,4, 500)
     atractores_con_periodo(p, rs, x0, N, plot = True)
 
 if __name__ == "__main__":
     # Configuración del logger. Se puede cambiar el nivel del logger para debuguear o no imprimir ningún mensaje.
-    logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+    logging.basicConfig(level=logging.WARN, format='%(message)s')
     logging.getLogger('matplotlib').setLevel(logging.ERROR)
     main()
