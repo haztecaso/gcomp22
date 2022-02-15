@@ -169,6 +169,7 @@ def atractores_con_periodo(p:int, rs:np.ndarray, x0:float, N:int, ε:float = DEF
     plot = kwargs.get('plot', True)
     show = kwargs.get('show', True)
     fmt  = kwargs.get('fmt', 'ro')
+    if plot: plt.xlabel('r'); plt.ylabel('x')
     for r in rs:
         logging.debug(f"{r = }")
         try:
