@@ -9,11 +9,15 @@ from typing import Dict, List
 from decimal import Decimal
 from heapq import heappop, heappush
 from graphviz import Digraph
+from os import remove as remove_file
 
 FICHERO_MUESTRA_ES = "./GCOM2022_pract2_auxiliar_esp.txt"
 FICHERO_MUESTRA_EN = "./GCOM2022_pract2_auxiliar_eng.txt"
 
 def frecuencias(texto:str)-> Dict[str, Decimal]:
+    """
+    Dado un texto calcula las frecuencias de cada caracter del texto.
+    """
     letras = dict()
     for char in texto:
         if char not in letras:
@@ -23,7 +27,10 @@ def frecuencias(texto:str)-> Dict[str, Decimal]:
     n = len(texto)
     return {char:frec/n for (char, frec) in letras.items()}
 
-class Arbol():
+class ArbolHuffman():
+    """
+    Clase para árboles de Huffman.
+    """
     def __init__(self, **kwargs):
         assert 'clave' in kwargs or ('iz' in kwargs and 'dr' in kwargs)
         if 'clave' in kwargs:
@@ -71,17 +78,20 @@ class Arbol():
         if render:
             print(f"Guardando árbol en {title}.pdf")
             dot.render(title)
+            remove_file(title) # Borrando archivo extra que crea graphviz
+        return dot
 
 def huffman(frecs:Dict[str, Decimal]):
+    """
+    Implementación del algoritmo de Huffman.
+    """
     heap = []
     for clave, peso in frecs.items():
-        nodo = Arbol(clave = clave, peso = peso)
-        heappush(heap, nodo)
+        heappush(heap, ArbolHuffman(clave = clave, peso = peso))
     while len(heap) > 1:
         iz = heappop(heap)
         dr = heappop(heap)
-        a = Arbol(iz = iz, dr = dr)
-        heappush(heap, a)
+        heappush(heap, ArbolHuffman(iz = iz, dr = dr))
     return heap[0]
 
 def codigo_str(codigo:List[int]):
