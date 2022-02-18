@@ -5,10 +5,10 @@
 Autor: Adrián Lattes Grassi
 """
 
-from typing import Dict
+from typing import Dict, List
 from decimal import Decimal
 from heapq import heappop, heappush
-import graphviz
+from graphviz import Digraph
 
 FICHERO_MUESTRA_ES = "./GCOM2022_pract2_auxiliar_esp.txt"
 FICHERO_MUESTRA_EN = "./GCOM2022_pract2_auxiliar_eng.txt"
@@ -37,6 +37,7 @@ class Arbol():
             self.dr = kwargs['dr']
             self.peso = self.iz.peso + self.dr.peso
             self.clave = self.iz.clave + self.dr.clave
+        self._tabla_codigos = None
 
     def __lt__(self, other):
         return self.peso < other.peso
@@ -47,29 +48,44 @@ class Arbol():
     def __repr__(self):
         return f"['{self.clave}', {self.peso:.6f}]"
 
-    def graph(self, dot = graphviz.Digraph(comment='Árbol de Huffman')):
+    @property
+    def tabla_codigos(self):
+        if self._tabla_codigos is None:
+            if self.hoja:
+                self._tabla_codigos = {self.clave: []}
+            else:
+                codigos_iz = { clave: [0] + codigo for (clave, codigo) in self.iz.tabla_codigos.items()}
+                codigos_dr = { clave: [1] + codigo for (clave, codigo) in self.dr.tabla_codigos.items()}
+                self._tabla_codigos = {**codigos_iz, **codigos_dr}
+        return self._tabla_codigos
+
+    def graph(self, dot:Digraph = Digraph(comment='Árbol de Huffman'), render:bool = True, title:str='arbol'):
         if self.hoja:
             dot.node(self.clave, repr(self))
         else:
             dot.node(self.clave, repr(self))
-            self.iz.graph()
-            self.dr.graph()
-            dot.edge(self.clave, self.iz.clave)
-            dot.edge(self.clave, self.dr.clave)
-        return dot
+            self.iz.graph(dot = dot, render = False)
+            self.dr.graph(dot = dot, render = False)
+            dot.edge(self.clave, self.iz.clave, label="0")
+            dot.edge(self.clave, self.dr.clave, label="1")
+        if render:
+            print(f"Guardando árbol en {title}.pdf")
+            dot.render(title)
 
 def huffman(frecs:Dict[str, Decimal]):
-    h = []
+    heap = []
     for clave, peso in frecs.items():
         nodo = Arbol(clave = clave, peso = peso)
-        heappush(h, nodo)
-    while len(h) > 1:
-        iz = heappop(h)
-        dr = heappop(h)
+        heappush(heap, nodo)
+    while len(heap) > 1:
+        iz = heappop(heap)
+        dr = heappop(heap)
         a = Arbol(iz = iz, dr = dr)
-        heappush(h, a)
-    return h[0]
+        heappush(heap, a)
+    return heap[0]
 
+def codigo_str(codigo:List[int]):
+    return ''.join(map(str, codigo))
 
 def main():
     with open(FICHERO_MUESTRA_ES) as f:
@@ -78,9 +94,10 @@ def main():
     with open(FICHERO_MUESTRA_EN) as f:
         texto = '\n'.join(f.readlines())
         frec_en = frecuencias(texto)
-    h = huffman(frec_es)
-    dot = h.graph()
-    dot.render('graph')
+    arbol_es = huffman(frec_es)
+    arbol_en = huffman(frec_en)
+    arbol_es.graph(title = 'arbol_es')
+    arbol_en.graph(title = 'arbol_en')
 
 if __name__ == "__main__":
     main()
