@@ -8,6 +8,7 @@ Autor: Adrián Lattes Grassi
 from typing import Dict
 from decimal import Decimal
 from heapq import heappop, heappush
+import graphviz
 
 FICHERO_MUESTRA_ES = "./GCOM2022_pract2_auxiliar_esp.txt"
 FICHERO_MUESTRA_EN = "./GCOM2022_pract2_auxiliar_eng.txt"
@@ -46,6 +47,17 @@ class Arbol():
     def __repr__(self):
         return f"['{self.clave}', {self.peso:.6f}]"
 
+    def graph(self, dot = graphviz.Digraph(comment='Árbol de Huffman')):
+        if self.hoja:
+            dot.node(self.clave, repr(self))
+        else:
+            dot.node(self.clave, repr(self))
+            self.iz.graph()
+            self.dr.graph()
+            dot.edge(self.clave, self.iz.clave)
+            dot.edge(self.clave, self.dr.clave)
+        return dot
+
 def huffman(frecs:Dict[str, Decimal]):
     h = []
     for clave, peso in frecs.items():
@@ -67,11 +79,8 @@ def main():
         texto = '\n'.join(f.readlines())
         frec_en = frecuencias(texto)
     h = huffman(frec_es)
-    print(h)
-
-
-    
-    
+    dot = h.graph()
+    dot.render('graph')
 
 if __name__ == "__main__":
     main()
