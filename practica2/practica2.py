@@ -5,14 +5,13 @@
 Autor: Adrián Lattes Grassi
 """
 
-from typing import Dict, List
 from decimal import Decimal
+from functools import reduce
 from heapq import heappop, heappush
-from graphviz import Digraph
 from os import remove as remove_file
+from typing import Dict, List, Optional
+from sys import exit
 
-FICHERO_MUESTRA_ES = "./GCOM2022_pract2_auxiliar_esp.txt"
-FICHERO_MUESTRA_EN = "./GCOM2022_pract2_auxiliar_eng.txt"
 
 def frecuencias(texto:str)-> Dict[str, Decimal]:
     """
@@ -26,6 +25,21 @@ def frecuencias(texto:str)-> Dict[str, Decimal]:
             letras[char] += 1
     n = len(texto)
     return {char:frec/n for (char, frec) in letras.items()}
+
+
+class Codigo():
+    def __init__(self, codigo:List[bool] = None):
+        self.codigo = codigo if codigo is not None else []
+
+    def pre(self, valor:bool):
+        return Codigo([valor]+self.codigo)
+
+    def __add__(self, other):
+        return Codigo(self.codigo+other.codigo)
+
+    def __repr__(self):
+        return f"[{''.join(map(lambda b: '1' if b else '0', self.codigo))}]"
+
 
 class ArbolHuffman():
     """
@@ -53,35 +67,51 @@ class ArbolHuffman():
         return self.peso == other.peso
 
     def __repr__(self):
-        return f"['{self.clave}', {self.peso:.6f}]"
+        return f"['{self.clave}', {self.peso:.10f}]"
 
     @property
     def tabla_codigos(self):
         if self._tabla_codigos is None:
             if self.hoja:
-                self._tabla_codigos = {self.clave: []}
+                self._tabla_codigos = {self.clave: Codigo()}
             else:
-                codigos_iz = { clave: [0] + codigo for (clave, codigo) in self.iz.tabla_codigos.items()}
-                codigos_dr = { clave: [1] + codigo for (clave, codigo) in self.dr.tabla_codigos.items()}
-                self._tabla_codigos = {**codigos_iz, **codigos_dr}
+                codigos_iz = { clave: codigo.pre(False) for (clave, codigo) in self.iz.tabla_codigos.items()}
+                codigos_dr = { clave: codigo.pre(True) for (clave, codigo) in self.dr.tabla_codigos.items()}
+                self._tabla_codigos:Optional[Dict[str,Codigo]] = {**codigos_iz, **codigos_dr}
         return self._tabla_codigos
 
-    def graph(self, dot:Digraph = Digraph(comment='Árbol de Huffman'), render:bool = True, title:str='arbol'):
-        if self.hoja:
-            dot.node(self.clave, repr(self))
-        else:
-            dot.node(self.clave, repr(self))
-            self.iz.graph(dot = dot, render = False)
-            self.dr.graph(dot = dot, render = False)
-            dot.edge(self.clave, self.iz.clave, label="0")
-            dot.edge(self.clave, self.dr.clave, label="1")
-        if render:
-            print(f"Guardando árbol en {title}.pdf")
-            dot.render(title)
-            remove_file(title) # Borrando archivo extra que crea graphviz
-        return dot
+    def codificar(self, data:List[str]):
+        return reduce(lambda x,y: x+y,
+                map(lambda e: self.tabla_codigos[e], data),
+                Codigo())
 
-def huffman(frecs:Dict[str, Decimal]):
+    def decodificar(self, codigo:Codigo):
+        raise NotImplementedError
+
+    def graph(self, dot = None, render:bool = True, title:str='arbol'):
+        try:
+            from graphviz import Digraph
+        except ModuleNotFoundError as e:
+            print(f"ERROR: Para generar la gráfica de un ArbolHuffman es necesario instalar el paquete de python {e.name}.")
+        else:
+            if dot is None:
+                dot = Digraph(comment = title)
+            if self.hoja:
+                dot.node(self.clave, repr(self))
+            else:
+                dot.node(self.clave, repr(self))
+                self.iz.graph(dot, False)
+                self.dr.graph(dot, False)
+                dot.edge(self.clave, self.iz.clave, label="0")
+                dot.edge(self.clave, self.dr.clave, label="1")
+            if render:
+                print(f"Guardando árbol en {title}.pdf")
+                dot.render(title)
+                remove_file(title) # Borrando archivo extra que crea graphviz
+            return dot
+
+
+def huffman(frecs:Dict[str, Decimal]) -> ArbolHuffman:
     """
     Implementación del algoritmo de Huffman.
     """
@@ -94,20 +124,20 @@ def huffman(frecs:Dict[str, Decimal]):
         heappush(heap, ArbolHuffman(iz = iz, dr = dr))
     return heap[0]
 
-def codigo_str(codigo:List[int]):
-    return ''.join(map(str, codigo))
 
 def main():
-    with open(FICHERO_MUESTRA_ES) as f:
+    with open("./GCOM2022_pract2_auxiliar_esp.txt") as f:
         texto = '\n'.join(f.readlines())
         frec_es = frecuencias(texto)
-    with open(FICHERO_MUESTRA_EN) as f:
+    with open("./GCOM2022_pract2_auxiliar_eng.txt") as f:
         texto = '\n'.join(f.readlines())
         frec_en = frecuencias(texto)
     arbol_es = huffman(frec_es)
     arbol_en = huffman(frec_en)
     arbol_es.graph(title = 'arbol_es')
     arbol_en.graph(title = 'arbol_en')
+    print(f'{arbol_es.codificar(list("medieval")) = }')
+    print(f'{arbol_en.codificar(list("medieval")) = }')
 
 if __name__ == "__main__":
     main()
