@@ -10,7 +10,6 @@ from functools import reduce
 from heapq import heappop, heappush
 from os import remove as remove_file
 from typing import Dict, List, Optional
-from sys import exit
 
 
 def frecuencias(texto:str)-> Dict[str, Decimal]:
@@ -36,6 +35,9 @@ class Codigo():
 
     def __add__(self, other):
         return Codigo(self.codigo+other.codigo)
+
+    def __iter__(self):
+        yield from self.codigo
 
     def __repr__(self):
         return f"[{''.join(map(lambda b: '1' if b else '0', self.codigo))}]"
@@ -86,7 +88,14 @@ class ArbolHuffman():
                 Codigo())
 
     def decodificar(self, codigo:Codigo):
-        raise NotImplementedError
+        current = self
+        result = ""
+        for b in codigo:
+            current = current.dr if b else current.iz
+            if current.hoja:
+                result += current.clave
+                current = self
+        return result
 
     def graph(self, dot = None, render:bool = True, title:str='arbol'):
         try:
@@ -129,15 +138,26 @@ def main():
     with open("./GCOM2022_pract2_auxiliar_esp.txt") as f:
         texto = '\n'.join(f.readlines())
         frec_es = frecuencias(texto)
+    arbol_es = huffman(frec_es)
+    arbol_es.graph(title = 'arbol_es')
+    codigo_medieval_es = arbol_es.codificar(list("medieval"))
+    print(codigo_medieval_es)
+    print(arbol_es.decodificar(codigo_medieval_es))
+
     with open("./GCOM2022_pract2_auxiliar_eng.txt") as f:
         texto = '\n'.join(f.readlines())
         frec_en = frecuencias(texto)
-    arbol_es = huffman(frec_es)
     arbol_en = huffman(frec_en)
-    arbol_es.graph(title = 'arbol_es')
     arbol_en.graph(title = 'arbol_en')
-    print(f'{arbol_es.codificar(list("medieval")) = }')
-    print(f'{arbol_en.codificar(list("medieval")) = }')
+    codigo_medieval_en = arbol_en.codificar(list("medieval"))
+    print(codigo_medieval_en)
+    print(arbol_en.decodificar(codigo_medieval_en))
+    print()
+    codigo = Codigo(list(map(lambda d:True if d == '1' else False, "10111101101110110111011111")))
+    print(codigo)
+    print(arbol_en.decodificar(codigo))
+
+
 
 if __name__ == "__main__":
     main()
