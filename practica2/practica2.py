@@ -28,19 +28,26 @@ def frecuencias(texto:str)-> Dict[str, Decimal]:
 
 class Codigo():
     def __init__(self, codigo:List[bool] = None):
-        self.codigo = codigo if codigo is not None else []
+        self._codigo = codigo if codigo is not None else []
 
     def pre(self, valor:bool):
-        return Codigo([valor]+self.codigo)
+        return Codigo([valor]+self._codigo)
+
+    @property
+    def vacio(self):
+        return len(self._codigo) == 0
 
     def __add__(self, other):
-        return Codigo(self.codigo+other.codigo)
+        return Codigo(self._codigo + other._codigo)
+
+    def __len__(self):
+        return len(self._codigo)
 
     def __iter__(self):
-        yield from self.codigo
+        yield from self._codigo
 
     def __repr__(self):
-        return f"[{''.join(map(lambda b: '1' if b else '0', self.codigo))}]"
+        return f"[{''.join(map(lambda b: '1' if b else '0', self._codigo))}]"
 
 
 class ArbolHuffman():
@@ -82,19 +89,23 @@ class ArbolHuffman():
                 self._tabla_codigos:Optional[Dict[str,Codigo]] = {**codigos_iz, **codigos_dr}
         return self._tabla_codigos
 
-    def codificar(self, data:List[str]):
+    def codificar(self, data:str):
         return reduce(lambda x,y: x+y,
                 map(lambda e: self.tabla_codigos[e], data),
                 Codigo())
 
     def decodificar(self, codigo:Codigo):
-        current = self
+        actual = self
+        codigo_actual = Codigo()
         result = ""
         for b in codigo:
-            current = current.dr if b else current.iz
-            if current.hoja:
-                result += current.clave
-                current = self
+            actual = actual.dr if b else actual.iz
+            codigo_actual += Codigo([b])
+            if actual.hoja:
+                result += actual.clave
+                actual = self
+                codigo_actual = Codigo()
+        assert codigo_actual.vacio, f"No se ha terminado de decodificar el código. Código restante: {codigo_actual}"
         return result
 
     def graph(self, dot = None, render:bool = True, title:str='arbol'):
@@ -134,29 +145,39 @@ def huffman(frecs:Dict[str, Decimal]) -> ArbolHuffman:
     return heap[0]
 
 
+def longitud_media(frecuencias:Dict[str, Decimal], tabla_codigos:Dict[str,Codigo]) -> Decimal:
+    result = Decimal(0)
+    for clave, peso in frecuencias.items():
+        result += peso*len(tabla_codigos[clave])
+    return result
+
 def main():
     with open("./GCOM2022_pract2_auxiliar_esp.txt") as f:
         texto = '\n'.join(f.readlines())
         frec_es = frecuencias(texto)
-    arbol_es = huffman(frec_es)
-    arbol_es.graph(title = 'arbol_es')
-    codigo_medieval_es = arbol_es.codificar(list("medieval"))
-    print(codigo_medieval_es)
-    print(arbol_es.decodificar(codigo_medieval_es))
-
     with open("./GCOM2022_pract2_auxiliar_eng.txt") as f:
         texto = '\n'.join(f.readlines())
         frec_en = frecuencias(texto)
-    arbol_en = huffman(frec_en)
-    arbol_en.graph(title = 'arbol_en')
-    codigo_medieval_en = arbol_en.codificar(list("medieval"))
-    print(codigo_medieval_en)
-    print(arbol_en.decodificar(codigo_medieval_en))
-    print()
-    codigo = Codigo(list(map(lambda d:True if d == '1' else False, "10111101101110110111011111")))
-    print(codigo)
-    print(arbol_en.decodificar(codigo))
 
+    arbol_es = huffman(frec_es)
+    arbol_en = huffman(frec_en)
+
+    print(f"{longitud_media(frec_es, arbol_es.tabla_codigos) = }")
+    print(f"{longitud_media(frec_en, arbol_en.tabla_codigos) = }")
+
+    arbol_es.graph(title = 'arbol_es')
+    arbol_en.graph(title = 'arbol_en')
+
+    palabra = "medieval"
+
+    codigo_palabra_es = arbol_es.codificar(palabra)
+    codigo_palabra_en = arbol_en.codificar(palabra)
+
+    print(f"{arbol_es.decodificar(codigo_palabra_es), codigo_palabra_es = }")
+    print(f"{arbol_en.decodificar(codigo_palabra_en), codigo_palabra_en = }")
+
+    codigo = Codigo(list(map(lambda d:True if d == '1' else False, "10111101101110110111011111")))
+    print(f"{codigo, arbol_en.decodificar(codigo)                       = }")
 
 
 if __name__ == "__main__":
