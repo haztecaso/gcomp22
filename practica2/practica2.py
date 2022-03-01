@@ -47,7 +47,7 @@ class Codigo():
         yield from self._codigo
 
     def __repr__(self):
-        return f"[{''.join(map(lambda b: '1' if b else '0', self._codigo))}]"
+        return f"Codigo<{''.join(map(lambda b: '1' if b else '0', self._codigo))}>"
 
 
 class ArbolHuffman():
@@ -112,7 +112,7 @@ class ArbolHuffman():
         try:
             from graphviz import Digraph
         except ModuleNotFoundError as e:
-            print(f"ERROR: Para generar la gráfica de un ArbolHuffman es necesario instalar el paquete de python {e.name}.")
+            print(f"ATENCIÓN: Para generar la gráfica de un ArbolHuffman es necesario instalar el paquete {e.name}.")
         else:
             if dot is None:
                 dot = Digraph(comment = title)
@@ -125,7 +125,7 @@ class ArbolHuffman():
                 dot.edge(self.clave, self.iz.clave, label="0")
                 dot.edge(self.clave, self.dr.clave, label="1")
             if render:
-                print(f"Guardando árbol en {title}.pdf")
+                print(f"Árbol de Huffman guardado en {title}.pdf")
                 dot.render(title)
                 remove_file(title) # Borrando archivo extra que crea graphviz
             return dot
@@ -152,32 +152,46 @@ def longitud_media(frecuencias:Dict[str, Decimal], tabla_codigos:Dict[str,Codigo
     return result
 
 def main():
-    with open("./GCOM2022_pract2_auxiliar_esp.txt") as f:
+    with open("GCOM2022_pract2_auxiliar_esp.txt") as f:
         texto = '\n'.join(f.readlines())
         frec_es = frecuencias(texto)
-    with open("./GCOM2022_pract2_auxiliar_eng.txt") as f:
+    with open("GCOM2022_pract2_auxiliar_eng.txt") as f:
         texto = '\n'.join(f.readlines())
         frec_en = frecuencias(texto)
 
     arbol_es = huffman(frec_es)
     arbol_en = huffman(frec_en)
 
-    print(f"{longitud_media(frec_es, arbol_es.tabla_codigos) = }")
-    print(f"{longitud_media(frec_en, arbol_en.tabla_codigos) = }")
-
     arbol_es.graph(title = 'arbol_es')
     arbol_en.graph(title = 'arbol_en')
+    print()
 
-    palabra = "medieval"
+    print("i) Longitud media de los códigos de Huffman:")
+    print(f"  - Español: {longitud_media(frec_es, arbol_es.tabla_codigos):.3f}")
+    print(f"  - Inglés:  {longitud_media(frec_en, arbol_en.tabla_codigos):.3f}\n")
 
-    codigo_palabra_es = arbol_es.codificar(palabra)
-    codigo_palabra_en = arbol_en.codificar(palabra)
 
-    print(f"{arbol_es.decodificar(codigo_palabra_es), codigo_palabra_es = }")
-    print(f"{arbol_en.decodificar(codigo_palabra_en), codigo_palabra_en = }")
+    medieval = "medieval"
+    print(f"ii) Codificación de la palabra '{medieval}' en los dos idiomas:")
+
+    codigo_medieval_es = arbol_es.codificar(medieval)
+    codigo_medieval_en = arbol_en.codificar(medieval)
+
+    print(f"  - Español: {codigo_medieval_es}")
+    print(f"  - Inglés:  {codigo_medieval_en}\n")
 
     codigo = Codigo(list(map(lambda d:True if d == '1' else False, "10111101101110110111011111")))
-    print(f"{codigo, arbol_en.decodificar(codigo)                       = }")
+    print(f"iii A) Decodificación del código {codigo}:")
+    try:
+        print(f"{codigo, arbol_en.decodificar(codigo) = }\n")
+    except AssertionError:
+        print(f"ERROR: No se ha podido decodificar el código {codigo}\n")
+
+    print("iii B) Comprobación de que la decodificación funciona correctamente:")
+
+    print(f"  - Español: {arbol_es.decodificar(codigo_medieval_es) = }")
+    print(f"  - Inglés:  {arbol_en.decodificar(codigo_medieval_en) = }")
+
 
 
 if __name__ == "__main__":
