@@ -67,9 +67,9 @@ class ArbolHuffman():
     def __init__(self, **kwargs):
         assert 'clave' in kwargs or ('iz' in kwargs and 'dr' in kwargs)
         if 'clave' in kwargs:
+            self.hoja = True
             assert 'peso' in kwargs
             self.peso = kwargs['peso']
-            self.hoja = True
             self.clave = kwargs['clave']
         else:
             self.hoja = False
@@ -203,15 +203,16 @@ def main():
     print(f"""i) Comprobación del primer teorema de Shannon:
     - Español: H(C) = {entropia(frec_es):.4f}, L(C) = {longitud_media(frec_es, arbol_es.tabla_codigos):.4f}
     - Inglés:  H(C) = {entropia(frec_en):.4f}, L(C) = {longitud_media(frec_en, arbol_en.tabla_codigos):.4f}
-    - Con la codificación ASCII se utiliza un número fijo de bytes igual a 8.
     """)
 
     medieval = "medieval"
     codigo_medieval_es = arbol_es.codificar(medieval)
     codigo_medieval_en = arbol_en.codificar(medieval)
     print(f"""ii) Codificación de la palabra '{medieval}' en los dos idiomas:
-    - Español: {codigo_medieval_es}
-    - Inglés:  {codigo_medieval_en}
+    - Español: {codigo_medieval_es} (longitud {len(codigo_medieval_es)})
+    - Inglés:  {codigo_medieval_en} (longitud {len(codigo_medieval_en)})
+    - Con la codificación ASCII se utiliza un número fijo de bytes igual a 8,
+      con lo que la longitud de la palabra {medieval} sería {len(medieval)*8}.
     """)
 
     codigo = Codigo(list(map(lambda d:True if d == '1' else False, "10111101101110110111011111")))
