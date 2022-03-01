@@ -1,0 +1,261 @@
+\documentclass[10pt, spanish]{article}
+
+\usepackage[none]{hyphenat}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{csquotes}
+\usepackage{multicol}
+\usepackage{pgf}
+
+\usepackage{geometry}
+\def\margin{20mm}
+\geometry{
+    a4paper,
+    left=\margin,
+    right=\margin,
+    top=\margin,
+    bottom=\margin
+}
+
+% \usepackage[sorting=none]{biblatex}
+\usepackage{hyperref}
+
+\usepackage{lmodern}
+\usepackage{enumitem}
+%\setenumerate{label=(\alph*),leftmargin=0.6cm}
+% \setitemize{label=---,leftmargin=0.6cm}
+\usepackage{amssymb}
+\usepackage{mathtools}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+% For diagrams
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+
+% Theorems
+\usepackage{amsthm}
+\usepackage{thmtools}
+\newtheorem*{lema}{Lema}
+\newtheorem*{obs}{Observación}
+\newtheorem*{nota}{Nota}
+
+\addto\captionsspanish{\renewcommand\proofname{Solución}}
+
+\theoremstyle{definition}
+\newtheorem*{defin}{Definición}
+\newtheorem*{prop}{Proposición}
+\newtheoremstyle{break}{}{}{}{}{\bfseries}{.}{.5em}{Ejercicio #2}
+\theoremstyle{break}
+\newtheorem{ej}{Ejercicio}
+
+% No indentation
+\setlength\parindent{0pt}
+\setlength{\parskip}{0.5em}
+\let\emptyset\varnothing
+
+% Custom math commands
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+
+\DeclareMathSymbol{*}{\mathbin}{symbols}{"01}
+
+\DeclareMathOperator{\im}{Im}
+%\DeclareMathOperator{\ker}{Ker}
+\DeclareMathOperator{\mcm}{mcm}
+\DeclareMathOperator{\mcd}{mcd}
+
+\DeclareMathOperator{\bijmap}{\ \rlap{\ensuremath{\rightarrowtail}}%
+    {\ensuremath{\mkern2mu\twoheadrightarrow}}}
+
+\newcommand{\Zp}{\mathbb{Z}_{(p)}}
+
+\usepackage{graphicx}
+% \graphicspath{ {./plots/} }
+
+
+\usepackage{color}
+\definecolor{gray75}{gray}{0.75}
+\definecolor{pycommentcol}{rgb}{0.3,0.3,0.3}     % gray
+\definecolor{pystatecol}{rgb}{0,0,0.7}           % blue
+\definecolor{pystringcol}{rgb}{0,0.6,0}          % green
+\definecolor{pyinbuiltscol}{rgb}{0.55,0.15,0.55} % plum
+\definecolor{pyspecialcol}{rgb}{0.8,0.45,0.12}   % orange
+\definecolor{mygray}{gray}{0.3}
+\newcommand*{\pyfontfamily}{\fontfamily{DejaVuSansMono-TLF}\selectfont}
+
+\usepackage{listings}
+\lstset{inputpath=./}
+\usepackage{xcolor}
+
+
+\usepackage{textgreek}
+\newcommand\pythonstyle{\lstset{
+        language=Python,
+        literate=%esto es para que acepte acentos
+        {á}{{\'a}}1
+        {í}{{\'i}}1
+        {é}{{\'e}}1
+        {ý}{{\'y}}1
+        {ú}{{\'u}}1
+        {ó}{{\'o}}1
+        {ě}{{\v{e}}}1
+        {š}{{\v{s}}}1
+        {č}{{\v{c}}}1
+        {ř}{{\v{r}}}1
+        {ž}{{\v{z}}}1
+        {ď}{{\v{d}}}1
+        {ť}{{\v{t}}}1
+        {ñ}{{\~n}}1
+        {ň}{{\v{n}}}1                
+        {ů}{{\r{u}}}1
+        {Á}{{\'A}}1
+        {Í}{{\'I}}1
+        {É}{{\'E}}1
+        {Ý}{{\'Y}}1
+        {Ú}{{\'U}}1
+        {Ó}{{\'O}}1
+        {Ě}{{\v{E}}}1
+        {Š}{{\v{S}}}1
+        {Č}{{\v{C}}}1
+        {Ř}{{\v{R}}}1
+        {Ž}{{\v{Z}}}1
+        {Ď}{{\v{D}}}1
+        {Ť}{{\v{T}}}1
+        {Ň}{{\v{N}}}1                
+        {ε}{{\textepsilon}}1                
+        {±}{{$\pm$}}1                
+        {Ů}{{\r{U}}}1,
+        basicstyle=\pyfontfamily\scriptsize,
+        commentstyle=\color{pycommentcol}\itshape,
+        emph={self,cls,@classmethod,@property}, % Custom highlighting
+        emphstyle=\color{pyspecialcol}\itshape, % Custom highlighting style
+        morestring=[b]{"""},
+        stringstyle=\color{pystringcol},
+        keywordstyle=\color{pystatecol},        % statements
+        % remove any inbuilt functions from keywords
+        deletekeywords={print},
+        % Switch to predefined class that contain many, but not all,
+        % inbuilt functions and classes
+        classoffset=1,
+        % add any inbuilts, not statements
+        morekeywords={print,None,TypeError},
+        keywordstyle=\color{pyinbuiltscol},
+        frame=leftline,
+        numberstyle=\sffamily\tiny\color{mygray},
+        stepnumber=1,
+        numbers=left,
+        numbersep=10pt,                      
+        showstringspaces=false            
+}}
+
+\usepackage[labelformat=empty, labelfont={bf,it}, textfont=bf]{caption}%ponga solo el nombre en los codigos
+
+\pythonstyle
+\begin{document}
+\selectfont{\Large\textbf{Geometría computacional: Práctica 2}\hfill Adrián Lattes  Grassi} \noindent\rule{17cm}{1pt}
+
+\section{Introducción}
+
+En esta práctica he implementado en python el algoritmo de codificación de
+Huffman, uno de decodificación y funciones auxiliares para comprobar el Primer
+Teorema de Shannon.
+
+\section{Método}
+
+He implementado los algoritmos mediante programación orientada a objetos para
+aprovechar ciertas comodidades de python como la sobrecarga de operadores.
+Gracias a esto tambien se obtiene un código bastante modular y reutilizable.
+
+
+Además he implementado un método \texttt{graph} para visualizar los árboles de
+huffman (he incluido ejemplos de visualizaciones en los anexos).
+
+Para comprobar el Primer Teorema de Shannon he utilizado la siguiente definición
+de entropía, para un sistema de estados no equiprobables:
+
+\[ H(X) =-\sum_{i=1}^{n}P(x_i) \log_2{P(x_i)} \] 
+
+donde $X$ es una variable aleatoria discreta con $x_1,\ldots,x_n$ posibles
+estados que ocurren con probabilidades $P(x_1),\ldots,P(x_n)$. En nuestro caso
+$C=X$ es el conjunto de caracteres de un idioma y las probabilidades son las
+obtenidas a partir de las frecuencias de las muestras (los textos anexos).
+
+\section{Resultados}
+En la siguiente gráfica (includa como vectorial para poder visualizarse
+ampliando el documento) se puede ver el árbol de Huffman correspodiente al texto
+de referencia en Castellano.
+
+\begin{center}
+    \includegraphics[scale=0.1]{./arbol_es.pdf}
+\end{center}
+
+\subsection{Comprobación del Primer Teorema de Shannon}
+
+El Primer Teorema de Shannon nos da la siguiente cota para la longitud esperada
+de la codificación de Huffman: \[ H(C) \leq L(C) < H(C) + 1 \] donde $H(C)$
+es la entropía del sistema y $L(C)$ la longitud esperada.
+
+Los valores obtenidos para las muestras de textos en Español e Inglés son:
+
+\begin{itemize}
+    \item Español: $ H(C) = 4.4074$ y $ L(C) = 4.4439$ con lo que
+        \[H(C) = 4.4074 \leq L(C) = 4.4439 < H(C) + 1 = 5.4074.\] 
+    \item Inglés:  $H(C) = 4.1309$ y $L(C) = 4.1726$ con lo que
+        \[H(C) = 4.1309 \leq L(C) = 4.1726 < H(C) + 1 = 5.1309.\]
+\end{itemize} 
+
+\subsection{Codificación de la palabra 'medieval'}
+
+Una posible codificación binaria no comprimida para la palabra 'medieval' es la
+dada por la codificación \textit{ASCII}, que codifica cada caracter mediante un
+byte (ocho bits). Por tanto la longitud de la codificación 'medieval' es
+$8*\text{long}(\text{'medieval'})=8*8=64$.
+
+Utilizando una codificación de Huffman se consigue utilizar códigos más cortos
+para los caracteres de mayor frecuencia, con la finalidad de reducir la longitud
+final de la codificación. Estas son las codificaciones que he obtenido para la
+palabra medieval, con sus longitudes correspodientes:
+\begin{itemize}
+    \item Español: El código obtenido es
+        $11000101000000110010100111001000110101$, de longitud $38$.  
+    \item Inglés: El código obtenido es
+        $010011101110111110011000111010100000111001110101$, de longitud $48$.  
+\end{itemize}
+
+Con lo que se comprueba que en cierto sentido se ha conseguido el objetivo de
+reducir las codificaciones. El punto delicado es que las frecuencias esperadas de
+caracteres con las que se construyen los árboles de Huffman se correspondan
+realmente con las frecuencias de los textos que queremos codificar. De no ser
+así podríamos generar codificaciones incluso menos óptimas que la
+\textit{ASCII}. 
+
+\subsection{Decodificación de un código dado}
+
+He hecho una implementación del algoritmo de Huffman inspirada en la
+implementación clásica, utilizando montículos. Debido a esto el árbol resultante
+es distinto al de la plantilla, puesto que el algoritmo de ordenación de
+montículos no tiene la misma estabilidad que el sort de numpy.
+
+Por tanto con mi implementación no es posible decodificar el código
+proporcionado en el enunciado de la entrega. En lugar de esto he incluido en el
+código comprobaciones de que los códigos de la palabra 'medieval' obtenidos en
+el apartado anterior se decodifican correctamente en la palabra 'medieval'.
+
+\section{Código}
+
+El siguiente código con la implementación también está adjunto en la entrega
+y disponible, junto con esta memoria, en un repositorio git en el siguiente
+enlace:
+\href{https://www.github.com/haztecaso/gcomp22}{github.com/haztecaso/gcomp22}.
+\vspace{1em}
+
+\lstinputlisting[linerange={4}, firstnumber=4]{practica2.py}
+
+\end{document}
