@@ -10,6 +10,7 @@ from functools import reduce
 from heapq import heappop, heappush
 from os import remove as remove_file
 from typing import Dict, List, Optional
+from math import log2
 
 
 def frecuencias(texto:str)-> Dict[str, Decimal]:
@@ -27,10 +28,16 @@ def frecuencias(texto:str)-> Dict[str, Decimal]:
 
 
 class Codigo():
+    """
+    Clase para códigos binarios.
+    """
     def __init__(self, codigo:List[bool] = None):
         self._codigo = codigo if codigo is not None else []
 
     def pre(self, valor:bool):
+        """
+        Añade un valor al inicio del código
+        """
         return Codigo([valor]+self._codigo)
 
     @property
@@ -38,6 +45,9 @@ class Codigo():
         return len(self._codigo) == 0
 
     def __add__(self, other):
+        """
+        Sobrecarga del operador + para concatenar códigos
+        """
         return Codigo(self._codigo + other._codigo)
 
     def __len__(self):
@@ -90,11 +100,17 @@ class ArbolHuffman():
         return self._tabla_codigos
 
     def codificar(self, data:str):
+        """
+        Codifica una cadena de caracteres
+        """
         return reduce(lambda x,y: x+y,
                 map(lambda e: self.tabla_codigos[e], data),
                 Codigo())
 
     def decodificar(self, codigo:Codigo):
+        """
+        Decodifica un código (o secuencia de códigos) de Huffman.
+        """
         actual = self
         codigo_actual = Codigo()
         result = ""
@@ -109,6 +125,9 @@ class ArbolHuffman():
         return result
 
     def graph(self, dot = None, render:bool = True, title:str='arbol'):
+        """
+        Exporta un dibujo del árbol en pdf
+        """
         try:
             from graphviz import Digraph
         except ModuleNotFoundError as e:
@@ -146,10 +165,26 @@ def huffman(frecs:Dict[str, Decimal]) -> ArbolHuffman:
 
 
 def longitud_media(frecuencias:Dict[str, Decimal], tabla_codigos:Dict[str,Codigo]) -> Decimal:
+    """
+    Calcula la longitud esperada de la codificación de Huffman de un caracter,
+    dadas las frecuencias de los caracteres y la tabla de códigos de Huffman.
+    """
     result = Decimal(0)
     for clave, peso in frecuencias.items():
         result += peso*len(tabla_codigos[clave])
     return result
+
+
+def entropia(frecuencias:Dict[str, Decimal]):
+    """
+    Entropía de Shannon calculada según la definición de wikipedia:
+    https://en.wikipedia.org/wiki/Entropy_(information_theory)
+    """
+    result = Decimal(0)
+    for peso in frecuencias.values():
+        result += peso*Decimal(log2(peso))
+    return -result
+
 
 def main():
     with open("GCOM2022_pract2_auxiliar_esp.txt") as f:
@@ -161,24 +196,23 @@ def main():
 
     arbol_es = huffman(frec_es)
     arbol_en = huffman(frec_en)
-
     arbol_es.graph(title = 'arbol_es')
     arbol_en.graph(title = 'arbol_en')
     print()
 
-    print("i) Longitud media de los códigos de Huffman:")
-    print(f"  - Español: {longitud_media(frec_es, arbol_es.tabla_codigos):.3f}")
-    print(f"  - Inglés:  {longitud_media(frec_en, arbol_en.tabla_codigos):.3f}\n")
-
+    print(f"""i) Comprobación del primer teorema de Shannon:
+    - Español: H(C) = {entropia(frec_es):.4f}, L(C) = {longitud_media(frec_es, arbol_es.tabla_codigos):.4f}
+    - Inglés:  H(C) = {entropia(frec_en):.4f}, L(C) = {longitud_media(frec_en, arbol_en.tabla_codigos):.4f}
+    - Con la codificación ASCII se utiliza un número fijo de bytes igual a 8.
+    """)
 
     medieval = "medieval"
-    print(f"ii) Codificación de la palabra '{medieval}' en los dos idiomas:")
-
     codigo_medieval_es = arbol_es.codificar(medieval)
     codigo_medieval_en = arbol_en.codificar(medieval)
-
-    print(f"  - Español: {codigo_medieval_es}")
-    print(f"  - Inglés:  {codigo_medieval_en}\n")
+    print(f"""ii) Codificación de la palabra '{medieval}' en los dos idiomas:
+    - Español: {codigo_medieval_es}
+    - Inglés:  {codigo_medieval_en}
+    """)
 
     codigo = Codigo(list(map(lambda d:True if d == '1' else False, "10111101101110110111011111")))
     print(f"iii A) Decodificación del código {codigo}:")
@@ -188,10 +222,8 @@ def main():
         print(f"ERROR: No se ha podido decodificar el código {codigo}\n")
 
     print("iii B) Comprobación de que la decodificación funciona correctamente:")
-
     print(f"  - Español: {arbol_es.decodificar(codigo_medieval_es) = }")
     print(f"  - Inglés:  {arbol_en.decodificar(codigo_medieval_en) = }")
-
 
 
 if __name__ == "__main__":
