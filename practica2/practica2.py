@@ -177,12 +177,11 @@ def longitud_media(frecuencias:Dict[str, Decimal], tabla_codigos:Dict[str,Codigo
 
 def entropia(frecuencias:Dict[str, Decimal]):
     """
-    Entropía de Shannon calculada según la definición de wikipedia:
-    https://en.wikipedia.org/wiki/Entropy_(information_theory)
+    Entropía de Shannon.
     """
     result = Decimal(0)
     for peso in frecuencias.values():
-        result += peso*Decimal(log2(peso))
+        result += peso*Decimal(log2(peso)) # No he encontrado una implementación de log2 para Decimal
     return -result
 
 
