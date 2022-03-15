@@ -193,7 +193,7 @@ def main():
 
     apartado1(X)
     apartado2(X, 'euclidean')
-    # apartado2(X, 'manhattan')
+    apartado2(X, 'manhattan')
 
     plt.show()
 
