@@ -182,11 +182,11 @@ del mismo y permiten la reutilización y variación de parámetros del código:
         sistema y un conjunto de parámetros (\textit{n} para \textit{KMeans} y
         \textit{ε} para \textit{DBSCAN}) calcula las vecindades
         correspondientes, con sus valores medios de los coeficientes de
-        Silhouette.
+        \textit{Silhouette}.
     \item \texttt{kmeans\_elegir\_n\_clusters} y \texttt{dbscan\_elegir\_ε}:
-        Devuelve el índice del valor máximo de los coeficientes de Silhouette
+        Devuelve el índice del valor máximo de los coeficientes de \textit{Silhouette}
         calculados anteriormente. Además también dibuja la gráfica de los
-        distintos valores de los coeficientes de Silhouette al variar el
+        distintos valores de los coeficientes de \textit{Silhouette} al variar el
         parámetro del algoritmo, destacando el rojo el valor máximo.
     \item \texttt{dbscan\_cluster\_centroids}:
         Calcula los centroides de las vecindades calculadas con \textit{DBSCAN},
@@ -200,10 +200,10 @@ del mismo y permiten la reutilización y variación de parámetros del código:
 \section{Resultados}
 \subsection{Clasificación con algoritmo KMeans y predicción de nuevos estados}
 
-El número de vecindades con mayor coeficiente de Silhouette para el algoritmo
+El número de vecindades con mayor coeficiente de \textit{Silhouette} para el algoritmo
 \textit{KMeans} de entre los valores $[2,15]$ es el 3, como se puede ver en la
 figura de la izquierda. Además es interesante observar que no hay ningún otro
-valor que proporcione un coeficiente de Silhouette cercano al correspondiente a
+valor que proporcione un coeficiente de \textit{Silhouette} cercano al correspondiente a
 3 vecindades.  Por otro lado este es precisamente el valor esperado, ya que los
 estados del sistema han sido generados entorno a tres centros.
 
@@ -232,22 +232,22 @@ la vecindad 1.  \end{itemize}
 \subsection{Clasificación con algoritmo DBSCAN}
 
 Al aplicar el algoritmo \textit{DBSCAN} he fijado el número mínimo de elementos
-en $n_0=10$ y he considerado los coeficientes de Silhouette correspondientes a
+en $n_0=10$ y he considerado los coeficientes de \textit{Silhouette} correspondientes a
 los valores del umbral de distancia $\varepsilon\in(0.1, 0.4)$, tanto para la
 métrica euclideana como para la de Manhattan.
 
 En las gŕaficas de la izquierda se puede observar que ahora los valores del
-umbral de distancia con coeficiente de Silhouette máximo no están tan
+umbral de distancia con coeficiente de \textit{Silhouette} máximo no están tan
 diferenciados como en el caso del algoritmo \textit{KMeans}. Es decir, se intuye
 que existe un entorno del valor óptimo $\varepsilon$ en el que el coeficiente de
-Silhouette tiene una variación acotada.
+\textit{Silhouette} tiene una variación acotada.
 
-Además, para ambas métricas, los coeficientes de Silhouette máximos son
+Además, para ambas métricas, los coeficientes de \textit{Silhouette} máximos son
 considerablemente menores que en el caso anterior. Esto se refleja también en
 las gráficas de la derecha, en las que están dibujadas las vecindades. En este
 caso se han distinguido solo dos vecindades, estando agrupadas las vecindades 0
 y 2 del apartado anterior en una sola. Con esto se entiende que el coeficiente
-medio de Silhouette sea menor, ya que la vecindad 0 ahora es más grande y sus 
+medio de \textit{Silhouette} sea menor, ya que la vecindad 0 ahora es más grande y sus 
 puntos están "más separados entre sí".
 
 \subsubsection{DBSCAN con métrica euclideana}
