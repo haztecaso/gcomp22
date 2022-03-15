@@ -134,9 +134,11 @@ def apartado1(X):
 
     # Apartado 3
     test_data = [[0,0], [0, -1]]
+    print("Apartado 3:")
     for x, label in zip(test_data, kmeans_clusters.predict(test_data)):
         ax2.scatter(x[0], x[1], alpha=1, s=20, color="r")
-        print(x, label)
+        print(f"- El punto {x} pertenece a la vecindad {label}")
+    print()
     t6 = timer()
 
     # Tiempos de ejecución
@@ -176,6 +178,7 @@ def apartado2(X, metric):
     plot_clusters(X, dbscan_clusters, centers, ax2)
     t4 = timer()
 
+    # Tiempos de ejecución
     print(f"""Tiempos DBSCAN (métrica {metric})
 ----------------------------------
 Cálculo de los coeficientes de silhouette:  {t2-t1}
