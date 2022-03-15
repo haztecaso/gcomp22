@@ -8,6 +8,7 @@ pkgs.mkShell {
     ipython
     imagemagick
     graphviz
+    scikit-learn
   ];
    shellHook = ''
      alias python=ipython
