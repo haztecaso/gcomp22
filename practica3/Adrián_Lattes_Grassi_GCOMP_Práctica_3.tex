@@ -1,0 +1,225 @@
+\documentclass[10pt, spanish]{article}
+
+\usepackage[none]{hyphenat}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{csquotes}
+\usepackage{multicol}
+\usepackage{pgf}
+
+\usepackage{geometry}
+\def\margin{20mm}
+\geometry{
+    a4paper,
+    left=\margin,
+    right=\margin,
+    top=\margin,
+    bottom=\margin
+}
+
+% \usepackage[sorting=none]{biblatex}
+\usepackage{hyperref}
+
+\usepackage{lmodern}
+\usepackage{enumitem}
+%\setenumerate{label=(\alph*),leftmargin=0.6cm}
+% \setitemize{label=---,leftmargin=0.6cm}
+\usepackage{amssymb}
+\usepackage{mathtools}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+% For diagrams
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+
+% Theorems
+\usepackage{amsthm}
+\usepackage{thmtools}
+\newtheorem*{lema}{Lema}
+\newtheorem*{obs}{Observación}
+\newtheorem*{nota}{Nota}
+
+\addto\captionsspanish{\renewcommand\proofname{Solución}}
+
+\theoremstyle{definition}
+\newtheorem*{defin}{Definición}
+\newtheorem*{prop}{Proposición}
+\newtheoremstyle{break}{}{}{}{}{\bfseries}{.}{.5em}{Ejercicio #2}
+\theoremstyle{break}
+\newtheorem{ej}{Ejercicio}
+
+% No indentation
+\setlength\parindent{0pt}
+\setlength{\parskip}{0.5em}
+\let\emptyset\varnothing
+
+% Custom math commands
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+
+\DeclareMathSymbol{*}{\mathbin}{symbols}{"01}
+
+\DeclareMathOperator{\im}{Im}
+%\DeclareMathOperator{\ker}{Ker}
+\DeclareMathOperator{\mcm}{mcm}
+\DeclareMathOperator{\mcd}{mcd}
+
+\DeclareMathOperator{\bijmap}{\ \rlap{\ensuremath{\rightarrowtail}}%
+    {\ensuremath{\mkern2mu\twoheadrightarrow}}}
+
+\newcommand{\Zp}{\mathbb{Z}_{(p)}}
+
+\usepackage{graphicx}
+\graphicspath{ {./plots/} }
+
+
+\usepackage{color}
+\definecolor{gray75}{gray}{0.75}
+\definecolor{pycommentcol}{rgb}{0.3,0.3,0.3}     % gray
+\definecolor{pystatecol}{rgb}{0,0,0.7}           % blue
+\definecolor{pystringcol}{rgb}{0,0.6,0}          % green
+\definecolor{pyinbuiltscol}{rgb}{0.55,0.15,0.55} % plum
+\definecolor{pyspecialcol}{rgb}{0.8,0.45,0.12}   % orange
+\definecolor{mygray}{gray}{0.3}
+\newcommand*{\pyfontfamily}{\fontfamily{DejaVuSansMono-TLF}\selectfont}
+
+\usepackage{listings}
+\lstset{inputpath=./}
+\usepackage{xcolor}
+
+
+\usepackage{textgreek}
+\newcommand\pythonstyle{\lstset{
+        language=Python,
+        literate=%esto es para que acepte acentos
+        {á}{{\'a}}1
+        {í}{{\'i}}1
+        {é}{{\'e}}1
+        {ý}{{\'y}}1
+        {ú}{{\'u}}1
+        {ó}{{\'o}}1
+        {ě}{{\v{e}}}1
+        {š}{{\v{s}}}1
+        {č}{{\v{c}}}1
+        {ř}{{\v{r}}}1
+        {ž}{{\v{z}}}1
+        {ď}{{\v{d}}}1
+        {ť}{{\v{t}}}1
+        {ñ}{{\~n}}1
+        {ň}{{\v{n}}}1                
+        {ů}{{\r{u}}}1
+        {Á}{{\'A}}1
+        {Í}{{\'I}}1
+        {É}{{\'E}}1
+        {Ý}{{\'Y}}1
+        {Ú}{{\'U}}1
+        {Ó}{{\'O}}1
+        {Ě}{{\v{E}}}1
+        {Š}{{\v{S}}}1
+        {Č}{{\v{C}}}1
+        {Ř}{{\v{R}}}1
+        {Ž}{{\v{Z}}}1
+        {Ď}{{\v{D}}}1
+        {Ť}{{\v{T}}}1
+        {Ň}{{\v{N}}}1                
+        {ε}{{\textepsilon}}1                
+        {±}{{$\pm$}}1                
+        {Ů}{{\r{U}}}1,
+        basicstyle=\pyfontfamily\scriptsize,
+        commentstyle=\color{pycommentcol}\itshape,
+        emph={self,cls,@classmethod,@property}, % Custom highlighting
+        emphstyle=\color{pyspecialcol}\itshape, % Custom highlighting style
+        morestring=[b]{"""},
+        stringstyle=\color{pystringcol},
+        keywordstyle=\color{pystatecol},        % statements
+        % remove any inbuilt functions from keywords
+        deletekeywords={print},
+        % Switch to predefined class that contain many, but not all,
+        % inbuilt functions and classes
+        classoffset=1,
+        % add any inbuilts, not statements
+        morekeywords={print,None,TypeError},
+        keywordstyle=\color{pyinbuiltscol},
+        frame=leftline,
+        numberstyle=\sffamily\tiny\color{mygray},
+        stepnumber=1,
+        numbers=left,
+        numbersep=10pt,                      
+        showstringspaces=false            
+}}
+
+\usepackage[labelformat=empty, labelfont={bf,it}, textfont=bf]{caption}%ponga solo el nombre en los codigos
+
+\pythonstyle
+\begin{document}
+\selectfont{\Large\textbf{Geometría computacional: Práctica 3}\hfill Adrián Lattes  Grassi} \noindent\rule{17cm}{1pt}
+
+\section{Introducción}
+
+En esta práctica he utilizado los algoritmos de clasificación \textit{KMeans} y
+\textit{DBSCAN} sobre un sistema $X$ de 1000 elementos con dos estados cada uno.
+Para ello he utilizado las implementaciones de estos algoritmos de la librería
+\texttt{scikit-learn}.
+
+\section{Método y datos}
+
+Como datos he utilizado el sistema $X$ proporcionado en la plantilla: 
+
+\lstinputlisting[linerange={193-194}, firstnumber=193]{practica3.py}
+
+El programa está dividido en funciones que aislan las distintas funcionalidades
+del mismo y permiten la reutilización y variación de parámetros del código:
+\begin{itemize}
+    \item \texttt{kmeans\_silhouettes} y \texttt{dbscan\_silhouettes}: Dado un
+        sistema y un conjunto de parámetros (\textit{n} para \textit{KMeans} y
+        \textit{ε} para \textit{DBSCAN}) calcula las vecindades
+        correspondientes, con sus valores medios de los coeficientes de
+        Silhouette.
+    \item \texttt{kmeans\_elegir\_n\_clusters} y \texttt{dbscan\_elegir\_ε}:
+        Devuelve el índice del valor máximo de los coeficientes de Silhouette
+        calculados anteriormente. Además también dibuja la gráfica de los
+        distintos valores de los coeficientes de Silhouette al variar el
+        parámetro del algoritmo, destacando el rojo el valor máximo.
+    \item \texttt{dbscan\_cluster\_centroids}:
+        Calcula los centroides de las vecindades calculadas con \textit{DBSCAN},
+        útiles para pintar las etiquetas en las gráficas.
+    \item \texttt{plot\_clusters}:
+        Gráfica de las vecindades.
+    \item \texttt{plot\_voronoi}:
+        Gráfica del diagrama de voronoi.
+    \item \texttt{apartado1} y \texttt{apartado2}:
+        Gestión de los plots y llamadas a las funciones anteriores.
+\end{itemize}
+
+\section{Resultados}
+\subsection{Clasificación con algoritmo KMeans y predicción de nuevos estados}
+
+\begin{center}
+    \makebox[\textwidth][c]{\scalebox{0.65}{\input{plots/kmeans.pgf}}}
+\end{center}
+\subsection{Clasificación con algoritmo DBSCAN}
+\begin{center}
+    \makebox[\textwidth][c]{\scalebox{0.65}{\input{plots/dbscan-euclidean.pgf}}}
+\end{center}
+\begin{center}
+    \makebox[\textwidth][c]{\scalebox{0.65}{\input{plots/dbscan-manhattan.pgf}}}
+\end{center}
+
+\section{Código}
+
+El siguiente código con la implementación también está adjunto en la entrega
+y disponible, junto con esta memoria, en un repositorio git en el siguiente
+enlace:
+\href{https://www.github.com/haztecaso/gcomp22}{github.com/haztecaso/gcomp22}.
+\vspace{1em}
+
+\lstinputlisting[linerange={8}, firstnumber=8]{practica3.py}
+
+\end{document}
