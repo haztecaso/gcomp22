@@ -27152,7 +27152,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=6.000000in,y=4.214000in,,top]{\color{textcolor}\sffamily\fontsize{12.000000}{14.400000}\bfseries\selectfont DBSCAN (métrica manhattan)}%
+%\pgftext[x=6.000000in,y=4.214000in,,top]{\color{textcolor}\sffamily\fontsize{12.000000}{14.400000}\bfseries\selectfont DBSCAN (métrica manhattan)}%
 \end{pgfscope}%
 \end{pgfpicture}%
 \makeatother%

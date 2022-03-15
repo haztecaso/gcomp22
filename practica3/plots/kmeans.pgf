@@ -26297,7 +26297,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=6.000000in,y=4.223800in,,top]{\color{textcolor}\sffamily\fontsize{12.000000}{14.400000}\bfseries\selectfont Kmeans}%
+%\pgftext[x=6.000000in,y=4.223800in,,top]{\color{textcolor}\sffamily\fontsize{12.000000}{14.400000}\bfseries\selectfont Kmeans}%
 \end{pgfscope}%
 \end{pgfpicture}%
 \makeatother%

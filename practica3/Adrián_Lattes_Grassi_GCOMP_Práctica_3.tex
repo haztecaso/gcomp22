@@ -9,7 +9,7 @@
 \usepackage{pgf}
 
 \usepackage{geometry}
-\def\margin{20mm}
+\def\margin{18mm}
 \geometry{
     a4paper,
     left=\margin,
@@ -29,6 +29,10 @@
 \usepackage{mathtools}
 
 \renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+\usepackage{titlesec}
+
+\titlespacing*{\section}{0pt}{.7em}{.5em}
 
 % For diagrams
 \usepackage{tikz}
@@ -168,15 +172,12 @@ En esta práctica he utilizado los algoritmos de clasificación \textit{KMeans} 
 Para ello he utilizado las implementaciones de estos algoritmos de la librería
 \texttt{scikit-learn}.
 
-\section{Método y datos}
-
-Como datos he utilizado el sistema $X$ proporcionado en la plantilla: 
-
-\lstinputlisting[linerange={193-194}, firstnumber=193]{practica3.py}
+\section{Método}
 
 El programa está dividido en funciones que aislan las distintas funcionalidades
 del mismo y permiten la reutilización y variación de parámetros del código:
 \begin{itemize}
+\setlength\itemsep{0em}
     \item \texttt{kmeans\_silhouettes} y \texttt{dbscan\_silhouettes}: Dado un
         sistema y un conjunto de parámetros (\textit{n} para \textit{KMeans} y
         \textit{ε} para \textit{DBSCAN}) calcula las vecindades
@@ -190,10 +191,8 @@ del mismo y permiten la reutilización y variación de parámetros del código:
     \item \texttt{dbscan\_cluster\_centroids}:
         Calcula los centroides de las vecindades calculadas con \textit{DBSCAN},
         útiles para pintar las etiquetas en las gráficas.
-    \item \texttt{plot\_clusters}:
-        Gráfica de las vecindades.
-    \item \texttt{plot\_voronoi}:
-        Gráfica del diagrama de voronoi.
+    \item \texttt{plot\_clusters} y \texttt{plot\_voronoi}:
+        Gráfica de las vecindades y diagrama de \textit{Voronoi}.
     \item \texttt{apartado1} y \texttt{apartado2}:
         Gestión de los plots y llamadas a las funciones anteriores.
 \end{itemize}
@@ -201,16 +200,77 @@ del mismo y permiten la reutilización y variación de parámetros del código:
 \section{Resultados}
 \subsection{Clasificación con algoritmo KMeans y predicción de nuevos estados}
 
+El número de vecindades con mayor coeficiente de Silhouette para el algoritmo
+\textit{KMeans} de entre los valores $[2,15]$ es el 3, como se puede ver en la
+figura de la izquierda. Además es interesante observar que no hay ningún otro
+valor que proporcione un coeficiente de Silhouette cercano al correspondiente a
+3 vecindades.  Por otro lado este es precisamente el valor esperado, ya que los
+estados del sistema han sido generados entorno a tres centros.
+
+En la gráfica de la derecha se pueden observar las vecindades y diagrama
+correspondientes a este número óptimo de vecindades. Aquí también he dibujado en
+rojo los elementos $a=(0,0)$ y $b=(0,-1)$ que queremos clasificar. Con esto he
+podido comparar el resultado esperado visualmente con el obtenido con el método
+\texttt{kmeans.predict}.
+\begin{itemize}
+\setlength\itemsep{0em}
+    \item El punto $a$ está visiblemente en la vecindad 2, lo que coincide con
+        el resultado de  \texttt{kmeans.predict} 
+    \item El punto $b$ está visiblemente en la frontera entre las regiones de
+voronoi correspondientes a las vecindades 0 y 1. En este caso el método
+\texttt{kmeans.predict} nos dice que el elemento pertenece a la vecindad 0, lo
+que se corresponde con lo esperado, pero quizás es una información un tanto
+imprecisa, ya que solo con este dato no sabemos que el punto está muy cerca de
+la vecindad 1.  \end{itemize}
+
+\vspace{-1em}
+
 \begin{center}
     \makebox[\textwidth][c]{\scalebox{0.65}{\input{plots/kmeans.pgf}}}
 \end{center}
+
 \subsection{Clasificación con algoritmo DBSCAN}
+
+Al aplicar el algoritmo \textit{DBSCAN} he fijado el número mínimo de elementos
+en $n_0=10$ y he considerado los coeficientes de Silhouette correspondientes a
+los valores del umbral de distancia $\varepsilon\in(0.1, 0.4)$, tanto para la
+métrica euclideana como para la de Manhattan.
+
+En las gŕaficas de la izquierda se puede observar que ahora los valores del
+umbral de distancia con coeficiente de Silhouette máximo no están tan
+diferenciados como en el caso del algoritmo \textit{KMeans}. Es decir, se intuye
+que existe un entorno del valor óptimo $\varepsilon$ en el que el coeficiente de
+Silhouette tiene una variación acotada.
+
+Además, para ambas métricas, los coeficientes de Silhouette máximos son
+considerablemente menores que en el caso anterior. Esto se refleja también en
+las gráficas de la derecha, en las que están dibujadas las vecindades. En este
+caso se han distinguido solo dos vecindades, estando agrupadas las vecindades 0
+y 2 del apartado anterior en una sola. Con esto se entiende que el coeficiente
+medio de Silhouette sea menor, ya que la vecindad 0 ahora es más grande y sus 
+puntos están "más separados entre sí".
+
+\subsubsection{DBSCAN con métrica euclideana}
 \begin{center}
+    \vspace{-1em}
     \makebox[\textwidth][c]{\scalebox{0.65}{\input{plots/dbscan-euclidean.pgf}}}
 \end{center}
+\subsubsection{DBSCAN con métrica de Manhattan}
+\vspace{-1em}
 \begin{center}
     \makebox[\textwidth][c]{\scalebox{0.65}{\input{plots/dbscan-manhattan.pgf}}}
 \end{center}
+
+\section{Conclusión}
+
+Mi conclusión es que el algoritmo \textit{KMeans} tiene una mayor capacidad para
+distinguir vecindades de estados que están muy cercanas, pero que se acumulan
+entorno a puntos concretos, mientras que \textit{DBSCAN} no consigue hacer estas
+distinciones debido a que está considerando los valores de la bola de radio
+igual al umbral de distancia.
+
+Además no he notado grandes diferencias entre usar una métrica u otra en el
+algoritmo \textit{DBSCAN}.
 
 \section{Código}
 

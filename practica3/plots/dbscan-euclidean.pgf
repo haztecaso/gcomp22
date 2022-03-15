@@ -27252,7 +27252,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=6.000000in,y=4.223800in,,top]{\color{textcolor}\sffamily\fontsize{12.000000}{14.400000}\bfseries\selectfont DBSCAN (métrica euclidean)}%
+%\pgftext[x=6.000000in,y=4.223800in,,top]{\color{textcolor}\sffamily\fontsize{12.000000}{14.400000}\bfseries\selectfont DBSCAN (métrica euclidean)}%
 \end{pgfscope}%
 \end{pgfpicture}%
 \makeatother%
