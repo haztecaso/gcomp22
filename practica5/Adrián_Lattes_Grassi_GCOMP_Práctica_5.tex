@@ -1,0 +1,331 @@
+\documentclass[10pt, spanish]{article}
+
+\usepackage[none]{hyphenat}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{csquotes}
+\usepackage{multicol}
+\usepackage{pgf}
+
+\usepackage{geometry}
+\def\margin{18mm}
+\geometry{
+    a4paper,
+    left=\margin,
+    right=\margin,
+    top=\margin,
+    bottom=\margin
+}
+
+% \usepackage[sorting=none]{biblatex}
+\usepackage{hyperref}
+
+\usepackage{lmodern}
+\usepackage{enumitem}
+%\setenumerate{label=(\alph*),leftmargin=0.6cm}
+% \setitemize{label=---,leftmargin=0.6cm}
+\usepackage{amssymb}
+\usepackage{mathtools}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+\usepackage{titlesec}
+
+\titlespacing*{\section}{0pt}{.7em}{.5em}
+
+% For diagrams
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+
+% Theorems
+\usepackage{amsthm}
+\usepackage{thmtools}
+\newtheorem*{lema}{Lema}
+\newtheorem*{obs}{Observación}
+\newtheorem*{nota}{Nota}
+
+\addto\captionsspanish{\renewcommand\proofname{Solución}}
+
+\theoremstyle{definition}
+\newtheorem*{defin}{Definición}
+\newtheorem*{prop}{Proposición}
+\newtheoremstyle{break}{}{}{}{}{\bfseries}{.}{.5em}{Ejercicio #2}
+\theoremstyle{break}
+\newtheorem{ej}{Ejercicio}
+
+% No indentation
+\setlength\parindent{0pt}
+\setlength{\parskip}{0.5em}
+\let\emptyset\varnothing
+
+% Custom math commands
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+
+\DeclareMathSymbol{*}{\mathbin}{symbols}{"01}
+
+\DeclareMathOperator{\im}{Im}
+%\DeclareMathOperator{\ker}{Ker}
+\DeclareMathOperator{\mcm}{mcm}
+\DeclareMathOperator{\mcd}{mcd}
+
+\DeclareMathOperator{\bijmap}{\ \rlap{\ensuremath{\rightarrowtail}}%
+    {\ensuremath{\mkern2mu\twoheadrightarrow}}}
+
+\newcommand{\Zp}{\mathbb{Z}_{(p)}}
+
+\usepackage{graphicx}
+\graphicspath{ {./plots/} }
+
+
+\usepackage{color}
+\definecolor{gray75}{gray}{0.75}
+\definecolor{pycommentcol}{rgb}{0.3,0.3,0.3}     % gray
+\definecolor{pystatecol}{rgb}{0,0,0.7}           % blue
+\definecolor{pystringcol}{rgb}{0,0.6,0}          % green
+\definecolor{pyinbuiltscol}{rgb}{0.55,0.15,0.55} % plum
+\definecolor{pyspecialcol}{rgb}{0.8,0.45,0.12}   % orange
+\definecolor{mygray}{gray}{0.3}
+\newcommand*{\pyfontfamily}{\fontfamily{DejaVuSansMono-TLF}\selectfont}
+
+\usepackage{listings}
+\lstset{inputpath=./}
+\usepackage{xcolor}
+
+
+\usepackage{textgreek}
+\newcommand\pythonstyle{\lstset{
+        language=Python,
+        literate=%esto es para que acepte acentos
+        {á}{{\'a}}1
+        {í}{{\'i}}1
+        {é}{{\'e}}1
+        {ý}{{\'y}}1
+        {ú}{{\'u}}1
+        {ó}{{\'o}}1
+        {ě}{{\v{e}}}1
+        {š}{{\v{s}}}1
+        {č}{{\v{c}}}1
+        {ř}{{\v{r}}}1
+        {ž}{{\v{z}}}1
+        {ď}{{\v{d}}}1
+        {ť}{{\v{t}}}1
+        {ñ}{{\~n}}1
+        {ň}{{\v{n}}}1
+        {ů}{{\r{u}}}1
+        {Á}{{\'A}}1
+        {Í}{{\'I}}1
+        {É}{{\'E}}1
+        {Ý}{{\'Y}}1
+        {Ú}{{\'U}}1
+        {Ó}{{\'O}}1
+        {Ě}{{\v{E}}}1
+        {Š}{{\v{S}}}1
+        {Č}{{\v{C}}}1
+        {Ř}{{\v{R}}}1
+        {Ž}{{\v{Z}}}1
+        {Ď}{{\v{D}}}1
+        {Ť}{{\v{T}}}1
+        {Ň}{{\v{N}}}1
+        {α}{{\textalpha}}1
+        {ε}{{\textepsilon}}1
+        {±}{{$\pm$}}1
+        {Ů}{{\r{U}}}1,
+        basicstyle=\pyfontfamily\scriptsize,
+        commentstyle=\color{pycommentcol}\itshape,
+        emph={self,cls,@classmethod,@property}, % Custom highlighting
+        emphstyle=\color{pyspecialcol}\itshape, % Custom highlighting style
+        morestring=[b]{"""},
+        stringstyle=\color{pystringcol},
+        keywordstyle=\color{pystatecol},        % statements
+        % remove any inbuilt functions from keywords
+        deletekeywords={print},
+        % Switch to predefined class that contain many, but not all,
+        % inbuilt functions and classes
+        classoffset=1,
+        % add any inbuilts, not statements
+        morekeywords={print,None,TypeError},
+        keywordstyle=\color{pyinbuiltscol},
+        frame=leftline,
+        numberstyle=\sffamily\tiny\color{mygray},
+        stepnumber=1,
+        numbers=left,
+        numbersep=10pt,
+        showstringspaces=false
+}}
+
+\usepackage[labelformat=empty, labelfont={bf,it}, textfont=bf]{caption}%ponga solo el nombre en los codigos
+
+\pythonstyle
+\begin{document}
+\selectfont{\Large\textbf{Geometría computacional: Práctica 5}\hfill Adrián Lattes Grassi}\noindent\\\rule{\textwidth}{1pt}
+
+\section{Introducción}
+En esta práctiva he implementado la proyección estereográfica de la 2-esfera.
+Por un lado he calculado la imagen mediante la proyección de una curva sobre la
+superficie de la esfera y luego he desarrollado una animación interactiva de una
+deformación continua de la esfera.
+En esta práctica he implementado en python la imagen mediante la proyección
+estereográfica de la 2-esfera y una curva sobre ella; y en javascript la
+deformación continua de la 2-esfera dada por una familia paramétrica de
+funciones $f_{t}$, donde $t\in[0,1)$, tal que $f_0=\text{id}$ y
+$\lim_{t\rightarrow1}f_t=\Pi$ es la proyección estereográtifica.
+    
+\section{Método y resultados}
+
+\subsection{Apartado I}
+
+Este apartado lo he implementado en python, utilizando la \texttt{matplotlib} y
+\texttt{numpy} y basándome en la plantilla. He organizado el programa en
+funciones para mejorar la legibilidad del mismo y poder reutilizarlo. 
+
+\begin{itemize}
+    \item La función \texttt{sphere\_polar} genera las coordenadas esféricas $(u,v)$.
+    \item La función \texttt{polar\_to\_cartesian} hace el paso de coordenadas
+        polares a cartesianas. Si se quiere transformar una parametrización de
+        una superficie (por ejemplo las coordenadas generadas con la función \texttt{sphere\_polar})
+        se debe utilizar el producto \texttt{np.outer} (valor por defecto). Para transformar una
+        parametrización de una curva se debe utilizar el producto
+        \texttt{np.multiply} (pasando el parámetro \texttt{outer = False}).
+    \item La función \texttt{proj} calcula la imagen de una superficie o curva
+        mediante la proyección estereográfica.
+
+\end{itemize}
+
+\subsection{Apartado 2}
+
+Para este apartado me he permitido utilizar un lenguaje distinto,
+\textit{javascript/nodejs}, y la librería de 3D \textit{threejs}, para de este modo
+poder generar una animación ``continua'' e interactiva...
+
+
+\begin{itemize}
+    \item Para generar la superficie he utilizado la función
+        \texttt{SphereGeometry}, que devuelve un objeto de tipo
+        \texttt{geometry} que luego será modificado para ser deformado.
+    \item Para controlar el parámetro $t\in[0,1)$ he usado el módulo
+        \texttt{dat.gui} de la librería \textit{threejs}, mediante el método
+        \texttt{gui.add}.
+    \item La función \texttt{tick} se ejecuta en bucle, cada frame. Aquí se
+        calcula el estado actual del objeto \texttt{sphere}, teniendo en cuenta
+        el parámetro \texttt{t}. Además esta función se encarga de renderizar en
+        pantalla la superficie con un material y la malla.
+\end{itemize}
+
+En el primer anexo he incluido instrucciones para instalar y ejecutar este
+código.
+
+\section{Resultados}
+\subsection{Apartado I}
+
+He elegido como curva la dada por la siguiente parametrización en coordenadas polares:
+
+\[\begin{cases}
+    u(t) = \frac{\pi}{2}+\frac{\pi}{20}\cos(20t)\\
+    v(t) = t
+    \end{cases}\]
+
+Luego, utilizando las funciones descritas en la sección anterior he calculado la
+imagen de la curva a través de la proyección estereográfica, obteniendo los
+siguientes gráficos:
+
+\makebox[\textwidth][c]{\scalebox{0.5}{\input{Figure_1.pgf}}}
+
+\subsection{Apartado II}
+
+La libería \textit{threejs} está orientada al desarrollo de aplicaciones 3D para
+páginas web, por lo que el resultado compilado de la aplicación es una carpeta
+de ficheros \textit{.html}, \textit{.css} y \textit{.js} (carpeta \texttt{./dist}).
+
+Además he subido esta aplicación a mi servidor web y se puede acceder a ella
+desde el siguiente enlace:
+\href{https://haztecaso.com/stereographic}{haztecaso.com/stereographic}.
+
+La aplicación permite mover la cámara con el ratón, cambiando la perspectiva y
+la distancia de esta. Además en la esquina superior derecha se encuentra un
+control con el que modificar el valor del parámetro $t$ y animar la deformación.
+
+Estas son tres capturas del resultado, con distintos valores de $t$:
+
+\makebox[\textwidth][c]{\scalebox{0.19}{
+        \includegraphics{A}
+        \hspace{1em}
+        \includegraphics{B}
+        \hspace{1em}
+        \includegraphics{C}
+}}
+
+\appendix
+
+\section{Instrucciones para el código en javascript}
+
+El proyecto de \textit{javascript} (\textit{nodejs}) está formado por los
+siguientes ficheros:
+
+\begin{itemize}
+    \item \texttt{package.json}: Descripción del proyecto y lista de
+        dependencias. Esto hace posible instalar los paquetes necesarios usando el comando \texttt{npm}.
+    \item \texttt{src}: Código fuente del proyecto
+        \begin{itemize}
+            \item \texttt{script.js}: Código fuente del proyecto, donde realmente está ubicado el programa. El código de este fichero
+            \item \texttt{index.html}: Esqueleto de la web del proyecto
+                está incluido en el siguiente anexo.
+            \item \texttt{style.css}: Estilos de la página web.
+        \end{itemize}
+    \item \texttt{bundler}: Carpeta con ficheros de configuración para poder
+        compilar el programa en una carpeta con el proyecto web final.
+    \item \texttt{dist}: Carpeta con el resultado de la compilación.
+\end{itemize}
+
+Para instalar las dependencias hay que instalar los paquetes \texttt{node} y
+\texttt{npm}. Una vez hecho esto basta ejecutar \texttt{npm install} para
+instalar los módulos de \texttt{node} que necesita el proyecto. Una vez hecho
+esto se utilizarán los siguientes comandos:
+\begin{itemize}
+    \item \texttt{nmp dev}: Para previsualizar el proyecto en un navegador web
+        con recarga automática de los cambios.
+    \item \texttt{npm build}: Para compilar la aplicación y generar la carpeta
+        \texttt{dist}.
+\end{itemize}
+
+He incluido en la entrega en el campus virtual los ficheros del proyecto del siguiente modo:
+\begin{itemize}
+    \item \texttt{script.js}: Archivo principal del proyecto, donde está la
+        parte que concierne a la implementación del segundo apartado.
+    \item \texttt{project.zip}: Proyecto completo comprimido de nodejs, sin la
+        carpeta \texttt{dist}.
+    \item \texttt{dist.zip}: Proyecto compilado. Se puede visualizar el proyecto
+        abriendo el fichero \texttt{index.html} con cualquier navegador que
+        soporte \textit{javascript}.
+\end{itemize}
+
+\section{Código}
+El siguiente código con la implementación también está adjunto en la entrega
+y disponible, junto con esta memoria, en un repositorio git en el siguiente
+enlace: \href{https://www.github.com/haztecaso/gcomp22}{github.com/haztecaso/gcomp22}.
+
+\subsection{Apartado 1 (python)}
+
+\lstinputlisting[linerange={6}, firstnumber=8]{practica5.py}
+
+\subsection{Apartado 2 (javascript)}
+
+He incluido aqui el código del fichero \texttt{src/script.js}, donde está la
+parte central del programa. Para ejecutar o compilar la aplicación de
+\textit{threejs} es necesario tener \textit{nodejs} instalado y ejecutar el comando
+
+\begin{itemize}
+    \item \texttt{npm dev} para ejecutar la aplicación.
+    \item \texttt{npm build} para compilar la aplicación, que se guardará en la
+        carpeta \texttt{dist} y podrá abrirse un navegador web.
+\end{itemize}
+
+\lstinputlisting[linerange={0}, firstnumber=8]{./src/script.js}
+
+\end{document}
